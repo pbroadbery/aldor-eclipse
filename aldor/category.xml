@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/aldor_1.0.0.qualifier.jar" id="aldor" version="1.0.0.qualifier">
+      <category name="aldordev"/>
+   </feature>
+   <category-def name="aldordev" label="Aldor Development"/>
+</site>

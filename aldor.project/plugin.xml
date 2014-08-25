@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="AldorBuilder"
+         name="Aldor Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="aldor.project.builder.AldorBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="aldorNature"
+         name="Aldor Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="aldor.project.builder.AldorNature">
+         </run>
+      </runtime>
+      <builder
+            id="aldor.project.AldorBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Aldor Project Nature commands"
+            id="aldor.project.aldorNature.category">
+      </category>
+      <command
+            name="Add/RemoveAldor Project Nature"
+            defaultHandler="aldor.project.builder.AddRemoveAldorNatureHandler"
+            categoryId="aldor.project.aldorNature.category"
+            id="aldor.project.addRemoveAldorNature">
+      </command>
+   </extension>
+   
+   <!--
+   <extension point="org.eclipse.ui.menus">
+   
+	   <objectContribution id="aldor.project.enableNatureAction"
+	   			objectClass="org.eclipse.core.resources.IProject"
+	   			adaptable="true">
+	   	<action id="org.eclipse.m2e.enableNatureAction"
+	                 class="aldor.project.actions.EnableNatureAction"
+	                 label="Add aldor features"
+	                 style="push"
+		             menubarPath="org.eclipse.ui.projectConfigure/additions"
+	                 enablesFor="+"/>
+	   </objectContribution>
+	   
+	</extension>
+	-->   
+   
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+         <command
+               commandId="aldor.project.addRemoveAldorNature"
+               label="Disable Aldor builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                        </adapt>
+                        <test
+                              value="aldor.project.aldorNature"
+                              property="org.eclipse.core.resources.projectNature">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="aldor.project.addRemoveAldorNature"
+               label="Enable Aldor builder"
+               style="push">
+               <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <and>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                        </adapt>
+                        <not>
+                           <test
+                                 value="aldor.project.aldorNature"
+                                 property="org.eclipse.core.resources.projectNature">
+                           </test>
+                        </not>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   
+   <extension
+         id="aldorProblem"
+         name="Aldor Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="aldor.project.properties.AldorProjectPropertyPage"
+            id="aldor.project.properties.samplePropertyPage"
+            name="Aldor Project Page"
+            >
+         <enabledWhen>
+             <adapt type="org.eclipse.core.resources.IProject">
+        		<test property="org.eclipse.core.resources.projectNature" 
+              			value="aldor.project.aldorNature"/>
+		     </adapt>  
+         </enabledWhen>
+      </page>
+   </extension>
+
+</plugin>
