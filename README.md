@@ -3,6 +3,7 @@ This is a set of eclipse plugins for developing aldor code.
 Early stages, don't expect much beyond very basic functionality.
 
 To Use:
+
 1. Install the plug in (the 'aldor' project contains the 'Aldor' feature).
 2. Create a new project
 3. Do 'Configure/Enable Aldor Builder' from the project's context menu
