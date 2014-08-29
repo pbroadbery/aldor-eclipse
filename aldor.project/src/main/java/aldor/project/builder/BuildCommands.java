@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
@@ -36,9 +38,9 @@ public class BuildCommands {
 	private IProject project;
 	private AldorProjectOptions options = new AldorProjectOptions();
 	
-	BuildCommands(IProject project) {
+	public BuildCommands(IProject project) {
 		this.project = project;
-		options.load(project);
+		this.options.load(project);
 	}
 
 	private IProject project() {
@@ -140,6 +142,28 @@ public class BuildCommands {
 		ParsingOutputStream err = new ParsingOutputStream(errorStream);
 		launcher.waitAndRead(outputStream, err, monitor);
 	}
+	
+	
+	public Process runInterpOnIntermediate(final IFile file, String name, IProgressMonitor monitor) throws CoreException {
+		ICommandLauncher launcher = new CommandLauncher();
+		
+		launcher.setProject(project());
+		launcher.showCommand(true);
+
+	
+		AldorCommandLine commandLine = prepareRunInterpOnIntermediateCommandLine(file);		
+		
+		Process process = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
+				monitor);
+		if (process == null) {
+			return null;
+		}
+		OutputStreams.forceClose(process.getOutputStream());
+
+		return process;
+	}
+
+	
 
 	AldorCommandLine prepareBuildIntermediateCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
@@ -167,6 +191,17 @@ public class BuildCommands {
 		return commandLine;
 	}
 	
+
+	AldorCommandLine prepareRunInterpOnIntermediateCommandLine(IFile file) {
+		AldorProjectOptions options = new AldorProjectOptions();
+		options.load(project);
+		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
+		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		commandLine.inputFilePath(file.getLocation());
+		commandLine.addRunType(AldorCommandLine.RunType.Interp);
+
+		return commandLine;
+	}
 	
 	public boolean confirmCanBuild() {
 		AldorProjectOptions options = new AldorProjectOptions();
