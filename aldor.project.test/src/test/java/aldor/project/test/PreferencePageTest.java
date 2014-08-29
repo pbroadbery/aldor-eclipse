@@ -1,4 +1,4 @@
-package aldor.project;
+package aldor.project.test;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;

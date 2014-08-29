@@ -1,4 +1,4 @@
-package aldor.project;
+package aldor.project.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

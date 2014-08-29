@@ -1,4 +1,4 @@
-package aldor.project;
+package aldor.project.test;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;

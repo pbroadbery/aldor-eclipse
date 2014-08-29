@@ -1,4 +1,4 @@
-package aldor.dependency.core;
+package aldor.dependency.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 
 import org.junit.Test;
+
+import aldor.dependency.core.DependencyMap;
 
 public class DependencyMapTest {
 

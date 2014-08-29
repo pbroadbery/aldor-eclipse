@@ -1,9 +1,12 @@
-package aldor.dependency.core;
+package aldor.dependency.core.test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import aldor.dependency.core.DependencyMap;
+import aldor.dependency.core.IDependencyState;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;

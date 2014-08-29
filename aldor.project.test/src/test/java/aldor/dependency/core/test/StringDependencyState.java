@@ -1,4 +1,6 @@
-package aldor.dependency.core;
+package aldor.dependency.core.test;
+
+import aldor.dependency.core.DelegatedDependencyState;
 
 class StringDependencyState extends DelegatedDependencyState<String> {
 

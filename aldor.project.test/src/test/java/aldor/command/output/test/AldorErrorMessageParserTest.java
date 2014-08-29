@@ -1,4 +1,4 @@
-package aldor.command.output;
+package aldor.command.output.test;
 
 import static org.junit.Assert.*;
 

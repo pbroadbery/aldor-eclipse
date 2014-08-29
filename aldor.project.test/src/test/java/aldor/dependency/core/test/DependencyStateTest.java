@@ -1,4 +1,4 @@
-package aldor.dependency.core;
+package aldor.dependency.core.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+
+import aldor.dependency.core.IDependencyState;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
