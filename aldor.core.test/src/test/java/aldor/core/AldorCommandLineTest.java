@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import aldor.core.commandline.AldorCommandLine;
 import aldor.core.commandline.AldorCommandLine.FileType;
+import aldor.core.commandline.AldorCommandLine.RunType;
 
 public class AldorCommandLineTest {
 
@@ -17,4 +18,13 @@ public class AldorCommandLineTest {
 		commandLine.inputFilePath(new Path("abc.def"));
 		assertEquals("aldor -Fao=foo/bar abc.def", commandLine.toCommandString());
 	}
+
+	@Test
+	public void test2() {
+		AldorCommandLine commandLine = new AldorCommandLine(new Path("aldor"));
+		commandLine.addRunType(RunType.Interp);
+		commandLine.inputFilePath(new Path("abc.def"));
+		assertEquals("aldor -Ginterp abc.def", commandLine.toCommandString());
+	}
+
 }

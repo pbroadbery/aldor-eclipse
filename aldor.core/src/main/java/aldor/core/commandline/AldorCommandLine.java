@@ -48,12 +48,15 @@ public class AldorCommandLine {
 		this.optionList.add(new FileGenerationOption(file, aoFile));
 	}
 	
+	public void addRunType(RunType interpType) {
+		this.optionList.add(new RunOption(interpType));
+	}
 	private interface Option {
 		String toCommandString();
 	}
 	
 	private class StringOption implements Option {
-		final String text;
+		final private String text;
 		
 		StringOption(String text) {
 			this.text = text;
@@ -141,6 +144,19 @@ public class AldorCommandLine {
 		}
 	}
 
+	private class RunOption implements Option {
+		final RunType type;
+
+		public RunOption(RunType type) {
+			this.type = type;
+		}
+
+		@Override
+		public String toCommandString() {
+			return "-" + AldorOption.Run.abbrev() + type.type();
+		}
+	}
+	
 	public String toCommandString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.executablePath.toOSString());
@@ -170,7 +186,7 @@ public class AldorCommandLine {
 	}
 	
 	static enum AldorOption {
-		File("F"), Library("l"), LibraryPath("Y"), OptimisationLevel("Q");
+		File("F"), Library("l"), LibraryPath("Y"), OptimisationLevel("Q"), Run("G");
 		
 		private String abbrev;
 
@@ -182,6 +198,19 @@ public class AldorCommandLine {
 			return abbrev;
 		}
 	}
+	
+	public enum RunType {
+		Loop("loop"), Interp("interp"), Run("run");
+		private final String type;
+		RunType(String type) {
+			this.type = type;
+		}
+		
+		public String type() {
+			return type;
+		}
+	}
+	
 
 	public String[] arguments() {
 		List<String> optionText = new ArrayList<>(optionList.size() + 1);
