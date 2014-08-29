@@ -196,7 +196,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 	}
 	
 	private void buildIntermediateFile(IProgressMonitor monitor, BuildCommands buildCommands, IFile file, IPath destPath) throws CoreException {
-		IPaths.createDirectoryForPath(destPath);
+		IPaths.createDirectoryForPath(getProject().getFile(destPath).getLocation());
 		buildCommands.buildIntermediateFile(file, monitor);
 		IFile destFile = getProject().getFile(destPath);
 		if (destFile.exists()) {
@@ -210,7 +210,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 	private void buildJavaFile(IResource resource, IProgressMonitor monitor, BuildCommands buildCommands) throws CoreException {
 		IFile file = (IFile) resource;
 		IPath destPath = buildCommands.javaFileName(file);
-		IPaths.createDirectoryForPath(destPath);
+		IPaths.createDirectoryForPath(getProject().getFile(destPath).getLocation());
 		buildCommands.buildJavaFile((IFile) resource, monitor);
 		IFile destFile = getProject().getFile(destPath);
 		if (destFile.exists()) {

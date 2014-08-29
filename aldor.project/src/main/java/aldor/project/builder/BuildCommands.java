@@ -26,6 +26,7 @@ import aldor.core.commandline.AldorCommandLine.FileType;
 import aldor.core.commandline.ArCommandLine;
 import aldor.core.project.AldorPreferenceModel;
 import aldor.project.properties.AldorProjectOptions;
+import aldor.util.IPaths;
 import aldor.util.OutputStreams;
 import aldor.util.event.EventAdapter;
 
@@ -210,7 +211,7 @@ public class BuildCommands {
 		IPath archiveFileName = archiveFileName(file);
 		if (archiveFileName.toFile().exists())
 			archiveFileName.toFile().delete();
-		
+		IPaths.createDirectoryForPath(project.getFile(archiveFileName).getLocation().removeLastSegments(1));
 		commandLine.archiveName(archiveFileName);
 		commandLine.addFiles(prerequisitePaths);
 		ICommandLauncher launcher = new CommandLauncher();

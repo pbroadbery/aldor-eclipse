@@ -7,7 +7,11 @@ public class IPaths {
 
 	public static void createDirectoryForPath(IPath destPath) throws CoreException {
 		IPath path = destPath.removeLastSegments(1);
-		path.toFile().mkdirs();
+		if (path.toFile().exists())
+			return;
+		if (!path.toFile().mkdirs()) {
+			throw new RuntimeException("Failed to create directory: " + path);
+		}
 	}
 
 	
