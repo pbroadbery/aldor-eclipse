@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="aldor.project.runners.interp.AldorLaunchInterpConfigurationDelegate"
+            id="aldor.project.runners.launchAldorInterp"
+            modes="run"
+            name="Aldor (Interpreted)">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="aldor.project.runners.ui.AldorLaunchInterpTabGroup"
+            id="aldor.project.runners.launchConfigurationTabGroup1"
+            type="aldor.project.runners.launchAldorInterp">
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="aldor.project.runners.interp.AldorInterpLaunchShortCut"
+            id="aldor.project.runners.AldorInterpShortCut"
+            label="Aldor (via interpreter)"
+            modes="run">
+         <contextualLaunch>
+            <enablement>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <test
+                        property="org.eclipse.debug.ui.matchesPattern"
+                        value="as">
+                  </test>
+               </iterate>
+            </enablement>
+         </contextualLaunch>
+         <configurationType
+               id="aldor.project.runners.launchAldorInterp">
+         </configurationType>
+      </shortcut>
+   </extension>
+
+</plugin>
