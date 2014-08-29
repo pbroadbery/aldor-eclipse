@@ -22,5 +22,6 @@ Import-Package: aldor.core,
  aldor.util.event,
  com.google.common.collect,
  com.google.common.io
-Export-Package: aldor.project.properties,
+Export-Package: aldor.project.builder,
+ aldor.project.properties,
  aldor.utils.ui
