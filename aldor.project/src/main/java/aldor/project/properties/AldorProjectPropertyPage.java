@@ -77,6 +77,15 @@ public class AldorProjectPropertyPage extends FieldEditorPreferencePage implemen
 		final OptionalFieldEditor aldorPath = new OptionalFieldEditor(aldorPathUI.title, aldorPathUI.name(), getFieldEditorParent());
 		addField(aldorPath);
 
+		AldorPreferenceUIField<?> aldorOptionsUI = uiFields.uiFieldForPreference(preferences.aldorOptions);
+		final StringFieldEditor aldorOptions= new StringFieldEditor(aldorOptionsUI.name(), aldorOptionsUI.name(), getFieldEditorParent());
+		addField(aldorOptions);
+
+		
+		AldorPreferenceUIField<?> intermediateFileLocationUI = uiFields.uiFieldForPreference(preferences.intermediateFileLocation);
+		final StringFieldEditor intermediateFileLocation= new StringFieldEditor(intermediateFileLocationUI.name(), intermediateFileLocationUI.name(), getFieldEditorParent());
+		addField(intermediateFileLocation);
+
 		AldorPreferenceUIField<?> libraryNameUI = uiFields.uiFieldForPreference(preferences.targetLibraryName);
 		final StringFieldEditor libraryName = new StringFieldEditor(libraryNameUI.name(), libraryNameUI.name(), getFieldEditorParent());
 		addField(libraryName);
