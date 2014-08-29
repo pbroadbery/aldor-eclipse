@@ -14,7 +14,7 @@ Require-Bundle: aldor.project;bundle-version="1.0.0",
  aldor.project.test,
  aldor.dependency.core,
  com.google.guava;bundle-version="15.0.0"
-Import-Package: aldor.command.output,
+Import-Package: aldor.command.output.test,
  aldor.core.project,
  aldor.util.event,
  junit.framework;version="4.11.0",
@@ -24,5 +24,5 @@ Import-Package: aldor.command.output,
  org.eclipse.swt.graphics,
  org.eclipse.swt.widgets,
  org.eclipse.ui.dialogs
-Export-Package: aldor.command.output,
- aldor.dependency.core
+Export-Package: aldor.command.output.test,
+ aldor.dependency.core.test
