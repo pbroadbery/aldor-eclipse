@@ -121,8 +121,6 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 	public void visitInBuildOrder(Function<Named, Boolean> function) {
 		dependencyMap.rebuild();
 		Map<String, Boolean> visited = new HashMap<String, Boolean>();
-		System.out.println("Known files: " + fileState.knownFiles());
-		System.out.println("Cycles: " + dependencyMap.cycles());
 		for (String name : fileState.knownFiles()) {
 			visitInBuildOrder0(function, name, visited);
 		}
@@ -248,7 +246,6 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		}
 
 		public NamedObj fileForString(String name) {
-			System.out.println("file for string " + name + " " + namedObjForString);
 			assert namedObjForString.containsKey(name);
 			return namedObjForString.get(name);
 		}

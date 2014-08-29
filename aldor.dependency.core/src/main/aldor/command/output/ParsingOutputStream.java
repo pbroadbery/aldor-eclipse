@@ -38,7 +38,6 @@ public class ParsingOutputStream extends OutputStream {
 	// .. which shouldn't happen anyway.
 	private void checkLine() {
 		if (builder.charAt(builder.length() - 1) == '\n') {
-			System.out.println("newline!");
 			eventHelper.event(builder.substring(0, builder.length()-1));
 			builder.setLength(0);
 		}
