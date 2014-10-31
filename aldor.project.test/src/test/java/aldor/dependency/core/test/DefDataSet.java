@@ -57,10 +57,6 @@ class DefDataSet {
 			
 	}
 
-	public int cycleCount() {
-		return 0;
-	}
-
 	public boolean isValidOrder(List<String> built) {
 		for (int i=0; i<built.size(); i++) {
 			List<String> rhs = built.subList(i+1, built.size());
@@ -81,6 +77,10 @@ class DefDataSet {
 				list.add(dep.getKey());
 		}
 		return list;
+	}
+
+	public int cycleCount() {
+		return 0;
 	}
 
 }

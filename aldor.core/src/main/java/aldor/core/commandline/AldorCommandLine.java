@@ -29,7 +29,11 @@ public class AldorCommandLine {
 	}
 	
 	public void addLibrary(String libId, IPath fileName) {
-		optionList.add(new LibraryOption(libId, fileName));
+		optionList.add(new AliasedLibraryOption(libId, fileName));
+	}
+
+	public void addLibrary(String libId) {
+		optionList.add(new LibraryOption(libId));
 	}
 	
 	void optimisationLevel(int lvl) {
@@ -51,6 +55,13 @@ public class AldorCommandLine {
 	public void addRunType(RunType interpType) {
 		this.optionList.add(new RunOption(interpType));
 	}
+	
+
+	private static String toCommandString(AldorOption option, Augment augment, String value) {
+		return "-" + option.abbrev() + augment.id() + "=" + value;
+	}
+	
+	
 	private interface Option {
 		String toCommandString();
 	}
@@ -83,19 +94,15 @@ public class AldorCommandLine {
 		}
 	}
 	
-	private static String toCommandString(AldorOption option, Augment augment, String value) {
-		return "-" + option.abbrev() + augment.id() + "=" + value;
-	}
-	
 	private interface Augment {
 		String id();
 	}
 
-	private class LibraryOption implements Option {
+	private class AliasedLibraryOption implements Option {
 		String libName;
 		IPath path;
 		
-		LibraryOption(String libName, IPath path) {
+		AliasedLibraryOption(String libName, IPath path) {
 			this.libName = libName;
 			this.path = path;
 		}
@@ -106,6 +113,20 @@ public class AldorCommandLine {
 		}
 	}
 	
+	private class LibraryOption implements Option {
+		private final String libName;
+		
+		LibraryOption(String libName) {
+			this.libName = libName;
+		}
+
+		@Override
+		public String toCommandString() {
+			return "-" + AldorOption.Library.abbrev + libName;
+		}
+	}
+	
+
 	public class LibNameAugment implements Augment {
 		private final String id;
 

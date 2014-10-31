@@ -13,7 +13,7 @@ public class AldorCommandLineTest {
 
 	@Test
 	public void test() {
-		AldorCommandLine commandLine = new AldorCommandLine(new Path("aldor"));
+		AldorCommandLine commandLine = new AldorCommandLine(Path.fromPortableString("aldor"));
 		commandLine.addOutput(FileType.Intermediate, new Path("foo/bar"));
 		commandLine.inputFilePath(new Path("abc.def"));
 		assertEquals("aldor -Fao=foo/bar abc.def", commandLine.toCommandString());

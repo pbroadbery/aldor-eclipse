@@ -26,7 +26,7 @@ class AldorDeltaVisitor implements IResourceDeltaVisitor {
 	@Override
 	public boolean visit(IResourceDelta delta) throws CoreException {
 		IResource resource = delta.getResource();
-		AldorCore.log("Looking at resource " + resource.toString(), null);
+		AldorCore.log("Looking at resource " + resource.toString() + " " + resource.getClass().getName(), null);
 		if (!(resource instanceof IFile))
 			return true;
 		IFile file = (IFile) resource;

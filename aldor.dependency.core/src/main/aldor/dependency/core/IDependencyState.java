@@ -16,10 +16,16 @@ public interface IDependencyState<FileObj> {
 	Collection<FileObj> needsDependencyUpdate();
 	
 	void visitInBuildOrder(Function<FileObj, Boolean> function);
-	
 	void visitInBuildOrder(Function<FileObj, Boolean> function, FileObj start);
 
+	boolean visitInBuildOrderForBuild(Function<FileObj, Boolean> function);
+
+	//  Each fileObj should have a unique name.. this tests if we know about it.
 	boolean isKnownName(String name);
 
+	// Mark file as depending on the supplied names.
 	void updateDependencies(FileObj file, Iterable<String> filtered);
+
+	boolean needsBuild(String name);
+	void built(String name);
 }

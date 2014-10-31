@@ -23,6 +23,10 @@ public class DependencyMap {
 
 	boolean needsRebuild = true;
 
+	public String toString() {
+		return "{DepMap: " + dependencyMap +" files: " + knownFiles +" dependencies: " + dependencies + "clq: " + cliques + "rev: " + reverseMap + "}";
+	}
+	
 	
 	public void dependsOn(String dependent, String dependency) {
 		dependencyMap.put(dependent, dependency);

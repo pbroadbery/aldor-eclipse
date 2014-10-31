@@ -12,7 +12,7 @@ public class XMLDocumentProvider extends FileDocumentProvider {
 	protected IDocument createDocument(Object element) throws CoreException {
 		IDocument document = super.createDocument(element);
 		if (document != null) {
-			IDocumentPartitioner partitioner =
+		IDocumentPartitioner partitioner =
 				new FastPartitioner(
 					new XMLPartitionScanner(),
 					new String[] {
@@ -20,7 +20,8 @@ public class XMLDocumentProvider extends FileDocumentProvider {
 						XMLPartitionScanner.XML_COMMENT });
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-		}
+
+			}
 		return document;
 	}
 }

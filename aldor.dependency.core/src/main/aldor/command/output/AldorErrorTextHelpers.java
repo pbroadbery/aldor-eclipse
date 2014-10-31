@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class AldorErrorTextHelpers {
 	static final private Pattern POS_PATTERN = Pattern.compile("^\\[L([0-9]+) C([0-9]+)\\].*");
-	static final Pattern SEV_PATTERN = Pattern.compile(".*\\(([A-Za-z]+)\\).*");
+	static final Pattern SEV_PATTERN = Pattern.compile("^[^(]*\\(([A-Za-z]+)\\).*");
 
 	public static int[] parsePosition(String line) {
 		assert !line.endsWith("\n");

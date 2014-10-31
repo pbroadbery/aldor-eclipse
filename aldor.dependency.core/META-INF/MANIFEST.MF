@@ -6,8 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: PAB
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.core.resources,
- com.google.guava;bundle-version="10.0.1",
- org.eclipse.equinox.common;bundle-version="3.6.200"
-Import-Package: aldor.util.event
+ com.google.guava
+Import-Package: aldor.util.event,
+ com.google.common.base;version="15.0.0"
 Export-Package: aldor.command.output,
  aldor.dependency.core

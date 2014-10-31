@@ -26,10 +26,9 @@ public class DependencyScanner {
 					break;
 				}
 				if (line.startsWith("--DEPS: ")) {
-					dependencies.addAll(Arrays.asList(line.split(" ")));
-				}
-				if (!line.startsWith("--")) {
-					break;
+					List<String> list = Arrays.asList(line.split(" "));
+					list = list.subList(1, list.size());
+					dependencies.addAll(list);
 				}
 			}
 			return dependencies;

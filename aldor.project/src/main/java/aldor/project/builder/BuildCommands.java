@@ -1,5 +1,6 @@
 package aldor.project.builder;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.cdt.core.CommandLauncher;
@@ -23,6 +24,7 @@ import org.eclipse.ui.console.MessageConsole;
 import aldor.command.output.AldorError;
 import aldor.command.output.AldorErrorMessageParser;
 import aldor.command.output.ParsingOutputStream;
+import aldor.core.AldorCore;
 import aldor.core.commandline.AldorCommandLine;
 import aldor.core.commandline.AldorCommandLine.FileType;
 import aldor.core.commandline.ArCommandLine;
@@ -47,6 +49,26 @@ public class BuildCommands {
 		return project;
 	}
 
+	public void emitBuildPlan(final IFile file, final String status) {
+		MessageConsole console = findConsole("AldorCommand");
+		final IOConsoleOutputStream outStream = console.newOutputStream();
+		
+		Display.getDefault().syncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				outStream.setColor(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+				try {
+					outStream.write(">>> "  + file  + " " + status + "\n");
+				} catch (IOException e) {
+					AldorCore.log(e);
+				}
+				finally {
+					outStream.setColor(null);
+				}
+			}});	
+	}
+	
 	public void buildIntermediateFile(final IFile file, IProgressMonitor monitor) throws CoreException {
 		ICommandLauncher launcher = new CommandLauncher();
 		launcher.setProject(project());
@@ -107,7 +129,7 @@ public class BuildCommands {
 		}
 	}
 
-	private MessageConsole findConsole(String name) {
+	private static MessageConsole findConsole(String name) {
 		ConsolePlugin plugin = ConsolePlugin.getDefault();
 		IConsoleManager conMan = plugin.getConsoleManager();
 		IConsole[] existing = conMan.getConsoles();
@@ -116,6 +138,7 @@ public class BuildCommands {
 				return (MessageConsole) existing[i];
 		// no console found, so create a new one
 		MessageConsole myConsole = new MessageConsole(name, null);
+		
 		conMan.addConsoles(new IConsole[] { myConsole });
 		return myConsole;
 	}
@@ -144,16 +167,31 @@ public class BuildCommands {
 	}
 	
 	
-	public Process runInterpOnIntermediate(final IFile file, String name, IProgressMonitor monitor) throws CoreException {
+	public Process runInterpOnIntermediate(final IFile file, String name, String[] env, IProgressMonitor monitor) throws CoreException {
 		ICommandLauncher launcher = new CommandLauncher();
-		
 		launcher.setProject(project());
 		launcher.showCommand(true);
-
 	
 		AldorCommandLine commandLine = prepareRunInterpOnIntermediateCommandLine(file);		
 		
-		Process process = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
+		Process process = launcher.execute(commandLine.executablePath(), commandLine.arguments(), env, project().getLocation() /* cwd */,
+				monitor);
+		if (process == null) {
+			return null;
+		}
+		OutputStreams.forceClose(process.getOutputStream());
+
+		return process;
+	}
+
+	public Process runAsBinaryOnIntermediate(IFile file, String name, String[] env, IProgressMonitor monitor) throws CoreException {
+		ICommandLauncher launcher = new CommandLauncher();
+		launcher.setProject(project());
+		launcher.showCommand(true);
+	
+		AldorCommandLine commandLine = prepareRunBinaryOnIntermediateCommandLine(file);		
+		
+		Process process = launcher.execute(commandLine.executablePath(), commandLine.arguments(), env, project().getLocation() /* cwd */,
 				monitor);
 		if (process == null) {
 			return null;
@@ -202,6 +240,19 @@ public class BuildCommands {
 
 		return commandLine;
 	}
+
+
+	AldorCommandLine prepareRunBinaryOnIntermediateCommandLine(IFile file) {
+		AldorProjectOptions options = new AldorProjectOptions();
+		options.load(project);
+		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
+		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		commandLine.inputFilePath(file.getLocation());
+		commandLine.addRunType(AldorCommandLine.RunType.Run);
+		commandLine.addLibrary("aldor");
+		return commandLine;
+	}
+	
 	
 	public boolean confirmCanBuild() {
 		AldorProjectOptions options = new AldorProjectOptions();

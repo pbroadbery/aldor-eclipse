@@ -29,7 +29,9 @@ public class AldorErrorMapper {
 		severityCodeForSeverity.put(AldorErrorSeverity.WARN, IMarker.SEVERITY_WARNING);
 		severityCodeForSeverity.put(AldorErrorSeverity.ERROR, IMarker.SEVERITY_ERROR);
 		severityCodeForSeverity.put(AldorErrorSeverity.FATAL, IMarker.SEVERITY_ERROR);
+		severityCodeForSeverity.put(AldorErrorSeverity.UNKNOWN, IMarker.SEVERITY_ERROR);
 	}
+	
 	public static int severityCode(AldorErrorSeverity severity) {
 		assert severityCodeForSeverity.size() == AldorErrorSeverity.values().length;
 		return severityCodeForSeverity.get(severity);

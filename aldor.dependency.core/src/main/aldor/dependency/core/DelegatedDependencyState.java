@@ -43,6 +43,12 @@ public abstract class DelegatedDependencyState<T> implements
 	public DelegatedDependencyState() {
 		this.delegate = new DependencyState<Wrapper>();
 	}
+	
+	@Override
+	public String toString() {
+		return delegate.toString();
+	}
+
 
 	@Override
 	public void release() {
@@ -88,6 +94,19 @@ public abstract class DelegatedDependencyState<T> implements
 	}
 
 	@Override
+	public boolean visitInBuildOrderForBuild(final Function<T, Boolean> function) {
+		return delegate.visitInBuildOrderForBuild(new Function<Wrapper, Boolean>() {
+
+			@Override
+			public Boolean apply(DelegatedDependencyState<T>.Wrapper arg0) {
+				assert arg0 != null;
+				return function.apply(arg0.value());
+			}
+		});
+	}
+
+	
+	@Override
 	public void visitInBuildOrder(final Function<T, Boolean> function) {
 		delegate.visitInBuildOrder(new Function<Wrapper, Boolean>() {
 
@@ -109,6 +128,17 @@ public abstract class DelegatedDependencyState<T> implements
 				return function.apply(arg0.value());
 			}
 		}, new Wrapper(from));
+	}
+
+
+	@Override
+	public boolean needsBuild(String name) {
+		return delegate.needsBuild(name);
+	}
+
+	@Override
+	public void built(String name) {
+		delegate.built(name);
 	}
 
 	

@@ -18,6 +18,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 	DependencyMap dependencyMap = new DependencyMap();
 	KnownFileState<Named> fileState = new KnownFileState<Named>();
 	Set<String> needsDependencyUpdate = new TreeSet<>();
+	Set<String> needsRebuild = new TreeSet<>();
 
 	/*
 	 * (non-Javadoc)
@@ -30,8 +31,15 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		// ensuring a blow up).
 		dependencyMap = null;
 		fileState = null;
+		needsRebuild = null;
+		needsDependencyUpdate = null;
 	}
 
+	@Override
+	public String toString() {
+		return "{DepState " + dependencyMap 
+				+ " Files: " + fileState +" Rebuild: "+ needsRebuild + " depUpdate: " + needsDependencyUpdate + "}";
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -43,6 +51,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		boolean needsUpdate = fileState.add(file);
 		if (needsUpdate)
 			updateDependencies(file.getName());
+		this.needsRebuild.add(file.getName());
 		assert fileState.validate();
 		assert !this.needsDependencyUpdate().isEmpty();
 	}
@@ -74,6 +83,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 	@Override
 	public void aldorFileChanged(Named file) {
 		assert fileState.validate();
+		needsRebuild.add(file.getName());
 	}
 
 	/*
@@ -101,13 +111,20 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 	@Override
 	public void updateDependencies(Named file, Iterable<String> scan) {
 		String name = fileState.stringForName(file);
+		boolean needsBuild = false;
 		if (name == null) {
 			return;
 		}
 		for (String dependencyName : scan) {
-			if (fileState.isKnownName(dependencyName))
+			if (fileState.isKnownName(dependencyName) && !dependencyMap.isDependency(name, dependencyName)) {
 				dependencyMap.dependsOn(name, dependencyName);
+				needsBuild = true;
+			}
 		}
+		
+		if (needsBuild)
+			this.needsRebuild.add(name);
+		this.needsDependencyUpdate.remove(name);
 	}
 
 	/*
@@ -136,6 +153,8 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 	private Boolean visitInBuildOrder0(Function<Named, Boolean> function, String name, Map<String, Boolean> visited) {
 		if (visited.containsKey(name))
 			return visited.get(name);
+
+		visited.put(name, false);
 		if (dependencyMap.inCycle(name)) {
 			visited.put(name, false);
 			return false;
@@ -150,6 +169,64 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		}
 		visited.put(name, success);
 		return success;
+	}
+
+	enum Status {
+		Updated, Failed, UpToDate;
+
+		public Status and(Status status) {
+			switch (this) {
+			case Updated:
+				if (status == Failed)
+					return Failed;
+				return Updated;
+			case Failed:
+				return Failed;
+			case UpToDate:
+				return status;
+			default:
+				throw new RuntimeException();
+			}
+		}
+	}
+
+	public boolean visitInBuildOrderForBuild(Function<Named, Boolean> function) {
+		dependencyMap.rebuild();
+		Map<String, Status> visited = new HashMap<String, Status>();
+		Status status = Status.UpToDate;
+		for (String name : fileState.knownFiles()) {
+			status = status.and(visitInBuildOrderForBuild0(function, name, visited));
+		}
+
+		if (status == Status.Failed)
+			return false;
+		return true;
+	}
+	
+	private Status visitInBuildOrderForBuild0(Function<Named, Boolean> function, String name, Map<String, Status> visited) {
+		if (visited.containsKey(name))
+			return visited.get(name);
+		visited.put(name, Status.Failed);
+
+		if (dependencyMap.inCycle(name)) {
+			visited.put(name, Status.Failed);
+			return Status.Failed;
+		}
+
+		Status status = Status.UpToDate;
+		// We could do a parallel build here...
+		for (String dependencyName : dependencyMap.dependencies(name)) {
+			status = status.and(visitInBuildOrderForBuild0(function, dependencyName, visited));
+		}
+		if (status.equals(Status.UpToDate) && !needsBuild(name)) {
+			visited.put(name, status);
+			return Status.UpToDate;
+		}
+		else {
+			boolean result = safeApply(function, name);
+			visited.put(name, status);
+			return result ? Status.Updated : Status.Failed;
+		}
 	}
 
 	private Boolean safeApply(Function<Named, Boolean> function, String name) {
@@ -222,7 +299,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 				return false;
 			} else {
 				namedObjForString.remove(name);
-				return true;
+				return false;
 			}
 		}
 
@@ -250,5 +327,15 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 			return namedObjForString.get(name);
 		}
 
+	}
+
+	@Override
+	public boolean needsBuild(String name) {
+		return needsRebuild.contains(name);
+	}
+
+	@Override
+	public void built(String name) {
+		needsRebuild.remove(name);
 	}
 }

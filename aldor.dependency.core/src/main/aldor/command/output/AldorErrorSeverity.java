@@ -1,7 +1,7 @@
 package aldor.command.output;
 
 public enum AldorErrorSeverity {
-	NOTE("Note"), WARN("Warning"), ERROR("Error"), FATAL("Fatal");
+	NOTE("Note"), WARN("Warning"), ERROR("Error"), FATAL("Fatal"), UNKNOWN("???");
 
 	private String text;
 	AldorErrorSeverity(String text) {
@@ -12,6 +12,6 @@ public enum AldorErrorSeverity {
 			if (sev.text.equals(levelText))
 				return sev;
 		}
-		return null;
+		return UNKNOWN;
 	}
 }

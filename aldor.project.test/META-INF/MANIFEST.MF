@@ -6,16 +6,14 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: PAB
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: aldor.project;bundle-version="1.0.0",
- org.mockito;bundle-version="1.8.4",
  org.junit,
- org.eclipse.equinox.preferences,
  org.eclipse.core.resources;bundle-version="3.9.0",
- org.objenesis;bundle-version="1.0.0",
- aldor.project.test,
  aldor.dependency.core,
- com.google.guava;bundle-version="15.0.0"
+ com.google.guava;bundle-version="15.0.0",
+ org.easymock;bundle-version="2.4.0"
 Import-Package: aldor.command.output.test,
  aldor.core.project,
+ aldor.util,
  aldor.util.event,
  junit.framework;version="4.11.0",
  org.eclipse.core.runtime;version="3.4.0",

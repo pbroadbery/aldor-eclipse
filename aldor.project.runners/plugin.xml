@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="aldor.project.runners.interp.AldorLaunchInterpConfigurationDelegate"
+            delegate="aldor.project.runners.AldorLaunchInterpConfigurationDelegate"
             id="aldor.project.runners.launchAldorInterp"
             modes="run"
             name="Aldor (Interpreted)">
@@ -21,7 +21,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            class="aldor.project.runners.interp.AldorInterpLaunchShortCut"
+            class="aldor.project.runners.AldorInterpLaunchShortCut"
             id="aldor.project.runners.AldorInterpShortCut"
             label="Aldor (via interpreter)"
             modes="run">
@@ -42,6 +42,48 @@
                id="aldor.project.runners.launchAldorInterp">
          </configurationType>
       </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="aldor.project.runners.AldorLaunchBinaryConfigurationDelegate"
+            id="aldor.project.runners.launchAldorBinary"
+            modes="run"
+            name="Aldor (Binary)">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="aldor.project.runners.AldorBinaryLaunchShortCut"
+            id="aldor.project.runners.AldorBinaryShortCut"
+            label="Aldor (Binary)"
+            modes="run">
+         <contextualLaunch>
+            <enablement>
+               <count
+                     value="1">
+               </count>
+               <iterate>
+                  <test
+                        property="org.eclipse.debug.ui.matchesPattern"
+                        value="as">
+                  </test>
+               </iterate>
+            </enablement>
+         </contextualLaunch>
+         <configurationType
+               id="aldor.project.runners.launchAldorInterp">
+         </configurationType>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="aldor.project.runners.ui.AldorLaunchBinaryTabGroup"
+            id="aldor.project.runners.launchConfigurationTabGroup2"
+            type="aldor.project.runners.launchAldorBinary">
+      </launchConfigurationTabGroup>
    </extension>
 
 </plugin>

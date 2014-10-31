@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import aldor.project.runners.interp.AldorRunnerMetaModel.ConfigAttribute;
+import aldor.project.runners.AldorRunnerMetaModel.ConfigAttribute;
 
 public class AldorLaunchInterpMainTab extends AbstractLaunchConfigurationTab {
 	Text projectName;
@@ -25,8 +25,8 @@ public class AldorLaunchInterpMainTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			projectName.setText(configuration.getAttribute(ConfigAttribute.INTERP_Project.text(), ""));
-			fileName.setText(configuration.getAttribute(ConfigAttribute.INTERP_File.text(), ""));
+			projectName.setText(configuration.getAttribute(ConfigAttribute.RUNNER_Project.text(), ""));
+			fileName.setText(configuration.getAttribute(ConfigAttribute.RUNNER_File.text(), ""));
 		} catch (CoreException e) {
 			throw new RuntimeException("Creating configuration from " + configuration.getName(), e);
 		}
@@ -34,8 +34,8 @@ public class AldorLaunchInterpMainTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(ConfigAttribute.INTERP_Project.text(), projectName.getText());
-		configuration.setAttribute(ConfigAttribute.INTERP_File.text(), fileName.getText());
+		configuration.setAttribute(ConfigAttribute.RUNNER_Project.text(), projectName.getText());
+		configuration.setAttribute(ConfigAttribute.RUNNER_File.text(), fileName.getText());
 	}
 
 	@Override

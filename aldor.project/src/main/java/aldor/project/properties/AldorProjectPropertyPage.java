@@ -111,6 +111,7 @@ public class AldorProjectPropertyPage extends FieldEditorPreferencePage implemen
 	}
 
 	private IProject getProject() {
+		System.out.println("Adapter: " + getElement() +"  " + getElement().getAdapter(IProject.class));
 		IProject project = (IProject) getElement().getAdapter(IProject.class);
 		return project;
 	}

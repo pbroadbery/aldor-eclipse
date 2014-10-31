@@ -2,14 +2,13 @@ package aldor.command.output;
 
 import aldor.util.event.EventSource;
 
-public class AldorErrorMessageParser extends EventSource<AldorError> implements
-		AldorLineEventListener {
+public class AldorErrorMessageParser extends EventSource<AldorError> implements AldorLineEventListener {
 	AldorError currentError;
 
 	@Override
 	public void onEvent(String line) {
 		assert !line.endsWith("\n");
-		if (line.length() == 0) 
+		if (line.length() == 0)
 			return;
 		if (line.startsWith("\"")) {
 			flushCurrentError();
@@ -26,12 +25,10 @@ public class AldorErrorMessageParser extends EventSource<AldorError> implements
 		String text = line.substring(0, line.length() - 1);
 		if (line.startsWith("[")) {
 			int[] spos = AldorErrorTextHelpers.parsePosition(text);
-			AldorErrorSeverity severity = AldorErrorTextHelpers
-					.parseSeverity(text);
+			AldorErrorSeverity severity = AldorErrorTextHelpers.parseSeverity(text);
 			return new AldorError(spos, severity, text);
 		} else {
-			AldorErrorSeverity severity = AldorErrorTextHelpers
-					.parseSeverity(text);
+			AldorErrorSeverity severity = AldorErrorTextHelpers.parseSeverity(text);
 			return new AldorError(null, severity, text);
 		}
 	}

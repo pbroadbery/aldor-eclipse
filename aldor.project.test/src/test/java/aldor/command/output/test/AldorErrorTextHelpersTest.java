@@ -51,6 +51,13 @@ public class AldorErrorTextHelpersTest {
 		AldorErrorSeverity sev = AldorErrorTextHelpers.parseSeverity("[L11 C12] #22 (Warning) This is slightly borked");
 		assertEquals(AldorErrorSeverity.WARN, sev);
 	}
+
+	@Test
+	public void testParseOfErrorLevel() {
+		AldorErrorSeverity sev = AldorErrorTextHelpers.parseSeverity("[L11 C12] #22 (Warning) This is (slightly) borked");
+		assertEquals(AldorErrorSeverity.WARN, sev);
+	}
+
 	
 	private int[] parsePosition(String text) {
 		int[] p = AldorErrorTextHelpers.parsePosition(text);
