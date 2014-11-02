@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="aldor.project.wizard"
+            name="Aldor">
+      </category>
+      <wizard
+            category="aldor.project.wizard"
+            class="aldor.project.wizard.AldorProjectNewWizard"
+            finalPerspective="aldor.project.wizard.aldorperspective"
+            icon="src/main/icons/logo-32.png"
+            id="aldor.project.wizard.ProjectNew"
+            name="Aldor Project"
+            project="true">
+      </wizard>
+      <wizard
+            class="aldor.project.wizard.aldorsource.AldorNewSourceFile"
+            descriptionImage="src/main/icons/logo-file-32.png"
+            icon="src/main/icons/logo-16.png"
+            id="aldor.project.wizard.aldorsource"
+            name="Aldor Source File">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="aldor.project.wizard.AldorPerspectiveFactory"
+            icon="src/main/icons/logo.-32png"
+            id="aldor.project.wizard.aldorperspective"
+            name="Aldor Perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="aldor.project.wizard.aldorperspective">
+         <view
+               id="aldor.customnavigator.view"
+               minimized="false"
+               ratio="0.25"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               visible="true">
+         </view>
+         <view
+               id="org.eclipse.ui.views.ProblemView"
+               minimized="false"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss">
+         </view>
+         <view
+               id="org.eclipse.ui.console.ConsoleView"
+               minimized="false"
+               ratio="0.1"
+               relationship="stack"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="aldor.project.wizard.aldorperspective">
+         <newWizardShortcut
+               id="aldor.project.wizard.ProjectNew">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="aldor.project.wizard.aldorsource">
+         </newWizardShortcut>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>

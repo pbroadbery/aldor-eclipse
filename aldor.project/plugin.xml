@@ -124,7 +124,7 @@
             type="org.eclipse.core.resources.problemmarker">
       </super>
       <persistent
-            value="true">
+            value="false">
       </persistent>
    </extension>
    <extension
@@ -141,6 +141,19 @@
 		     </adapt>  
          </enabledWhen>
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="src/icons/logo-32.png"
+            id="aldor.project.natureimage"
+            natureId="aldor.project.aldorNature">
+         <description>
+            Aldor Project.
+
+Contains all your good stuff
+         </description>
+      </image>
    </extension>
 
 </plugin>

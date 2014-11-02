@@ -24,23 +24,20 @@ public class AddRemoveAldorNatureHandler extends AbstractHandler {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		//
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
-					.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
 				Object element = it.next();
 				IProject project = null;
 				if (element instanceof IProject) {
 					project = (IProject) element;
 				} else if (element instanceof IAdaptable) {
-					project = (IProject) ((IAdaptable) element)
-							.getAdapter(IProject.class);
+					project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
 				}
 				if (project != null) {
 					try {
 						toggleNature(project);
 					} catch (CoreException e) {
-						//TODO log something
-						throw new ExecutionException("Failed to toggle nature",
-								e);
+						// TODO log something
+						throw new ExecutionException("Failed to toggle nature", e);
 					}
 				}
 			}
@@ -74,12 +71,6 @@ public class AddRemoveAldorNatureHandler extends AbstractHandler {
 			}
 		}
 
-		// Add the nature
-		String[] newNatures = new String[natures.length + 1];
-		System.arraycopy(natures, 0, newNatures, 0, natures.length);
-		newNatures[natures.length] = AldorNature.NATURE_ID;
-		description.setNatureIds(newNatures);
-		project.setDescription(description, null);
+		AldorProjectSupport.addNature(project);
 	}
-
 }
