@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="aldor.customnavigator.category"
+            name="%category.name">
+      </category>
+      <view
+            class="aldor.customnavigator.CustomNavigator"
+            id="aldor.customnavigator.view"
+            name="name - customNavigator"
+            restorable="true">
+      </view>
+      <view
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="src/icons/logo-16.png"
+            id="aldor.customnavigator.view"
+            name="Aldor Navigator">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            contentProvider="aldor.customnavigator.navigator.AldorContentProvider"
+            id="aldor.customnavigator.navigatorContent"
+            labelProvider="aldor.customnavigator.navigator.AldorLabelProvider"
+            name="Aldor Navigator Content">
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="aldor.customnavigator.CustomProjectWorkbenchRoot">
+               </instanceof>
+            </or>
+         </triggerPoints>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerActionBinding
+            viewerId="aldor.customnavigator.view">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+      <viewerContentBinding
+            viewerId="aldor.customnavigator.view">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.linkHelper">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+            <contentExtension
+                  pattern="aldor.customnavigator.navigatorContent">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+
+</plugin>
