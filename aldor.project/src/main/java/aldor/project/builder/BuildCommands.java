@@ -39,7 +39,7 @@ public class BuildCommands {
 	private static final AldorPreferenceModel preferences = AldorPreferenceModel.instance();
 	private IProject project;
 	private AldorProjectOptions options = new AldorProjectOptions();
-	
+
 	public BuildCommands(IProject project) {
 		this.project = project;
 		this.options.load(project);
@@ -52,7 +52,7 @@ public class BuildCommands {
 	public void emitBuildPlan(final IFile file, final String status) {
 		MessageConsole console = findConsole("AldorCommand");
 		final IOConsoleOutputStream outStream = console.newOutputStream();
-		
+
 		Display.getDefault().syncExec(new Runnable() {
 
 			@Override
@@ -66,9 +66,9 @@ public class BuildCommands {
 				finally {
 					outStream.setColor(null);
 				}
-			}});	
+			}});
 	}
-	
+
 	public void buildIntermediateFile(final IFile file, IProgressMonitor monitor) throws CoreException {
 		ICommandLauncher launcher = new CommandLauncher();
 		launcher.setProject(project());
@@ -79,9 +79,9 @@ public class BuildCommands {
 		ParsingOutputStream output = new ParsingOutputStream(outputStream);
 		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
 
-		AldorCommandLine commandLine = prepareBuildIntermediateCommandLine(file);		
+		AldorCommandLine commandLine = prepareBuildIntermediateCommandLine(file);
 		OutputStreams.writeSafely(outputStream, "[AO] " + commandLine.toCommandString() + "\n");
-		
+
 		Process p = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
 				monitor);
 		if (p == null) {
@@ -112,7 +112,7 @@ public class BuildCommands {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private void addMarker(IFile file, String message, int lineNumber, int severity) {
@@ -138,7 +138,7 @@ public class BuildCommands {
 				return (MessageConsole) existing[i];
 		// no console found, so create a new one
 		MessageConsole myConsole = new MessageConsole(name, null);
-		
+
 		conMan.addConsoles(new IConsole[] { myConsole });
 		return myConsole;
 	}
@@ -154,7 +154,7 @@ public class BuildCommands {
 
 		AldorCommandLine commandLine = prepareBuildJavaCommandLine(file);
 		OutputStreams.writeSafely(outputStream, "[Java] " + commandLine.toCommandString() + "\n");
-		
+
 		Process p = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
 				monitor);
 		if (p == null) {
@@ -165,15 +165,15 @@ public class BuildCommands {
 		ParsingOutputStream err = new ParsingOutputStream(errorStream);
 		launcher.waitAndRead(outputStream, err, monitor);
 	}
-	
-	
+
+
 	public Process runInterpOnIntermediate(final IFile file, String name, String[] env, IProgressMonitor monitor) throws CoreException {
 		ICommandLauncher launcher = new CommandLauncher();
 		launcher.setProject(project());
 		launcher.showCommand(true);
-	
-		AldorCommandLine commandLine = prepareRunInterpOnIntermediateCommandLine(file);		
-		
+
+		AldorCommandLine commandLine = prepareRunInterpOnIntermediateCommandLine(file);
+
 		Process process = launcher.execute(commandLine.executablePath(), commandLine.arguments(), env, project().getLocation() /* cwd */,
 				monitor);
 		if (process == null) {
@@ -188,9 +188,9 @@ public class BuildCommands {
 		ICommandLauncher launcher = new CommandLauncher();
 		launcher.setProject(project());
 		launcher.showCommand(true);
-	
-		AldorCommandLine commandLine = prepareRunBinaryOnIntermediateCommandLine(file);		
-		
+
+		AldorCommandLine commandLine = prepareRunBinaryOnIntermediateCommandLine(file);
+
 		Process process = launcher.execute(commandLine.executablePath(), commandLine.arguments(), env, project().getLocation() /* cwd */,
 				monitor);
 		if (process == null) {
@@ -201,7 +201,7 @@ public class BuildCommands {
 		return process;
 	}
 
-	
+
 
 	AldorCommandLine prepareBuildIntermediateCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
@@ -228,7 +228,7 @@ public class BuildCommands {
 		commandLine.addOutput(AldorCommandLine.FileType.Java, javaFile);
 		return commandLine;
 	}
-	
+
 
 	AldorCommandLine prepareRunInterpOnIntermediateCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
@@ -252,15 +252,22 @@ public class BuildCommands {
 		commandLine.addLibrary("aldor");
 		return commandLine;
 	}
-	
-	
+
+
 	public boolean confirmCanBuild() {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		if (options.get(preferences.executableLocation) == null) {
+		if (options.getOrDefault(preferences.executableLocation) == null) {
 			addMarker(project, "Missing aldor executable (to set, go to project preferences)", IMarker.SEVERITY_ERROR);
 			return false;
 		}
+		IPath path = options.getOrDefault(preferences.executableLocation);
+
+		if (!path.toFile().isFile()) {
+			addMarker(project, "Missing aldor executable " + path.toPortableString() + " (to set, go to project preferences)", IMarker.SEVERITY_ERROR);
+			return false;
+		}
+
 		return true;
 	}
 
@@ -309,7 +316,7 @@ public class BuildCommands {
 		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
 
 		OutputStreams.writeSafely(outputStream, "[AR] " + commandLine.toCommandString() + "\n");
-		
+
 		Process p = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
 				monitor);
 		if (p == null) {
@@ -320,5 +327,5 @@ public class BuildCommands {
 		launcher.waitAndRead(outputStream, errorStream, monitor);
 	}
 
-	
+
 }
