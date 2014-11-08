@@ -50,9 +50,9 @@ public class ParsingOutputStreamTest {
 	@Test
 	public void testContent() throws IOException {
 		assertEquals(Lists.newArrayList(), toList(""));
-		assertEquals(Lists.newArrayList("hello\n"), toList("hello\n"));
-		assertEquals(Lists.newArrayList("hello\n", "there\n"), toList("hello\nthere\n"));
-		assertEquals(Lists.newArrayList("\n", "zzz\n", "\n"), toList("\nzzz\n\n"));
+		assertEquals(Lists.newArrayList("hello"), toList("hello\n"));
+		assertEquals(Lists.newArrayList("hello", "there"), toList("hello\nthere\n"));
+		assertEquals(Lists.newArrayList("", "zzz", ""), toList("\nzzz\n\n"));
 	}
 	
 	private List<String> toList(String txt) throws IOException {

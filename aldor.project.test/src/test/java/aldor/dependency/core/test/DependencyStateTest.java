@@ -105,7 +105,7 @@ public class DependencyStateTest {
 		depState.built("a");
 		assertFalse(depState.needsBuild("a"));
 	}
-	
+
 	@Test
 	public void testNeedsBuild() {
 		DefDataSet ds = new DefDataSet();
@@ -114,11 +114,8 @@ public class DependencyStateTest {
 		
 		depState.aldorFileChanged("b");
 		assertTrue(depState.needsBuild("b"));
-
-		System.out.println("Dependencies: " + DependencyStates.buildOrderForBuild(depState) + " " + ds.dependents("b"));
-		assertTrue(DependencyStates.buildOrderForBuild(depState).containsAll(ds.dependents("b")));
 	}
-	
+
 	private void buildToList(IDependencyState<String> depState,
 			final List<String> built) {
 		depState.visitInBuildOrder(new Function<String, Boolean>() {

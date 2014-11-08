@@ -4,11 +4,14 @@ import org.easymock.EasyMock;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Assert;
 import org.junit.Test;
 
+import aldor.project.AldorProjectActivator;
+import aldor.project.IAldorProjectActivator;
 import aldor.project.builder.AldorNature;
 import aldor.project.properties.AldorProjectPropertyPage;
 
@@ -16,6 +19,14 @@ public class PreferencePage2Test {
 
 	@Test
 	public void testFoo() throws CoreException {
+		final IPreferenceStore localPreferenceStore = new PreferenceStore();
+		IAldorProjectActivator activator = new IAldorProjectActivator() {
+
+			@Override
+			public IPreferenceStore getPreferenceStore() {
+				return localPreferenceStore;
+			}};
+		AldorProjectActivator.setDefault(activator);
 		IProject project = EasyMock.createNiceMock(IProject.class);
 		AldorNature nature = new AldorNature();
 		EasyMock.expect(project.getAdapter(EasyMock.<Class<?>> anyObject())).andReturn(project).anyTimes();
