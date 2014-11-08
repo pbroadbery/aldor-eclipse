@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import aldor.util.Strings;
 
@@ -19,6 +20,9 @@ public class AldorPreferenceModel {
 	public final AldorPreference<IPath> javaFileLocation = new AldorPreference<>(IPath.class, "javaFileLocation");
 	public final AldorPreference<DependencyStyle> dependencyStyle = new AldorPreference<>(DependencyStyle.class, "dependencyStyle");
 	public final AldorPreference<String> targetLibraryName = new AldorPreference<String>(String.class, "targetLibraryName");
+	public final AldorPreference<String> includeFileName = new AldorPreference<String>(String.class, "includeFileName");
+
+	public AldorPreference<IPath> aldorSourceFilePath = new AldorPreference<IPath>(IPath.class, "aldorSourceFilePath");
 
 	public AldorPreferenceModel() {
 		
@@ -67,6 +71,15 @@ public class AldorPreferenceModel {
 		public int hashCode() {
 			return this.name().hashCode();
 		}
+
+		public String preference(IPreferenceStore preferences) {
+			return preferences.getString(this.name());
+		}
+
+		public T preferenceValue(IPreferenceStore preferences) {
+			return decode(preferences.getString(this.name()));
+		}
+
 	}
 	
 	enum DependencyStyle {
