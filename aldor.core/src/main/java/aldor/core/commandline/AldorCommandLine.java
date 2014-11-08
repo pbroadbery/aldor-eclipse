@@ -13,7 +13,7 @@ public class AldorCommandLine {
 	Optional<OptimisationOption> optimisationLevel = Optional.absent();
 	final List<Option> optionList = new LinkedList<>();
 	IPath inputFilePath;
-	
+
 	public AldorCommandLine(IPath executablePath) {
 		if (executablePath == null)
 			throw new RuntimeException();
@@ -27,7 +27,7 @@ public class AldorCommandLine {
 	public void inputFilePath(IPath iPath) {
 		this.inputFilePath = iPath;
 	}
-	
+
 	public void addLibrary(String libId, IPath fileName) {
 		optionList.add(new AliasedLibraryOption(libId, fileName));
 	}
@@ -35,40 +35,40 @@ public class AldorCommandLine {
 	public void addLibrary(String libId) {
 		optionList.add(new LibraryOption(libId));
 	}
-	
+
 	void optimisationLevel(int lvl) {
 		this.optimisationLevel = Optional.of(new OptimisationOption(lvl));
 	}
-	
+
 	void clearOptimisationLevel() {
 		this.optimisationLevel = Optional.absent();
 	}
-	
+
 	void addStringOption(String text) {
 		optionList.add(new StringOption(text));
 	}
-	
+
 	public void addOutput(FileType file, IPath aoFile) {
 		this.optionList.add(new FileGenerationOption(file, aoFile));
 	}
-	
+
 	public void addRunType(RunType interpType) {
 		this.optionList.add(new RunOption(interpType));
 	}
-	
+
 
 	private static String toCommandString(AldorOption option, Augment augment, String value) {
 		return "-" + option.abbrev() + augment.id() + "=" + value;
 	}
-	
-	
+
+
 	private interface Option {
 		String toCommandString();
 	}
-	
+
 	private class StringOption implements Option {
 		final private String text;
-		
+
 		StringOption(String text) {
 			this.text = text;
 		}
@@ -78,22 +78,22 @@ public class AldorCommandLine {
 			return text;
 		}
 	}
-	
+
 	private class FileGenerationOption implements Option {
 		private final FileType fileType;
 		private final IPath destination;
-		
+
 		FileGenerationOption(FileType fileType, IPath filePath) {
 			this.fileType = fileType;
 			this.destination = filePath;
 		}
-		
+
 		@Override
 		public String toCommandString() {
 			return AldorCommandLine.toCommandString(AldorOption.File, fileType, this.destination.toOSString());
 		}
 	}
-	
+
 	private interface Augment {
 		String id();
 	}
@@ -101,7 +101,7 @@ public class AldorCommandLine {
 	private class AliasedLibraryOption implements Option {
 		String libName;
 		IPath path;
-		
+
 		AliasedLibraryOption(String libName, IPath path) {
 			this.libName = libName;
 			this.path = path;
@@ -114,10 +114,10 @@ public class AldorCommandLine {
 			return AldorCommandLine.toCommandString(AldorOption.Library, new LibNameAugment(libName), path.toOSString());
 		}
 	}
-	
+
 	private class LibraryOption implements Option {
 		private final String libName;
-		
+
 		LibraryOption(String libName) {
 			this.libName = libName;
 		}
@@ -127,7 +127,7 @@ public class AldorCommandLine {
 			return "-" + AldorOption.Library.abbrev + libName;
 		}
 	}
-	
+
 
 	public class LibNameAugment implements Augment {
 		private final String id;
@@ -140,10 +140,10 @@ public class AldorCommandLine {
 			return id;
 		}
 	}
-	
+
 	private class OptimisationOption implements Option {
 		int optimisationLevel;
-		
+
 		public OptimisationOption(int lvl) {
 			this.optimisationLevel = lvl;
 		}
@@ -152,7 +152,7 @@ public class AldorCommandLine {
 		public String toCommandString() {
 			return ""+ AldorOption.OptimisationLevel.abbrev() + optimisationLevel;
 		}
-		
+
 		@Override
 		public boolean equals(Object other) {
 			if (!(other instanceof OptimisationOption))
@@ -160,7 +160,7 @@ public class AldorCommandLine {
 			OptimisationOption otherOpt = (OptimisationOption) other;
 			return optimisationLevel == otherOpt.optimisationLevel;
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return optimisationLevel;
@@ -179,7 +179,7 @@ public class AldorCommandLine {
 			return "-" + AldorOption.Run.abbrev() + type.type();
 		}
 	}
-	
+
 	public String toCommandString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.executablePath.toOSString());
@@ -191,15 +191,15 @@ public class AldorCommandLine {
 		sb.append(this.inputFilePath);
 		return sb.toString();
 	}
-	
+
 	static public enum FileType implements Augment {
 		Source("Source", "as"), Intermediate("Intermediate", "ao"), Object("object", "o"), Foam("Foam", "fm"), Java("Java", "java");
 		String extension;
-		
+
 		FileType(String type, String extension) {
 			assert !extension.contains(" ");
 			this.extension = extension;
-			
+
 		}
 
 		@Override
@@ -207,33 +207,33 @@ public class AldorCommandLine {
 			return extension;
 		}
 	}
-	
+
 	static enum AldorOption {
 		File("F"), Library("l"), LibraryPath("Y"), OptimisationLevel("Q"), Run("G");
-		
+
 		private String abbrev;
 
 		AldorOption(String abbrev) {
 			this.abbrev = abbrev;
 		}
-		
+
 		String abbrev() {
 			return abbrev;
 		}
 	}
-	
+
 	public enum RunType {
 		Loop("loop"), Interp("interp"), Run("run");
 		private final String type;
 		RunType(String type) {
 			this.type = type;
 		}
-		
+
 		public String type() {
 			return type;
 		}
 	}
-	
+
 
 	public String[] arguments() {
 		List<String> optionText = new ArrayList<>(optionList.size() + 1);
