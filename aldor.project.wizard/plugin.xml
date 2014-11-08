@@ -28,9 +28,9 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="aldor.project.wizard.AldorPerspectiveFactory"
-            icon="src/main/icons/logo.-32png"
+            icon="src/main/icons/logo-32.png"
             id="aldor.project.wizard.aldorperspective"
-            name="Aldor Perspective">
+            name="Aldor Development">
       </perspective>
    </extension>
    <extension
@@ -71,6 +71,17 @@
                id="aldor.project.wizard.aldorsource">
          </newWizardShortcut>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="aldor.project.wizard.category1"
+            name="name">
+      </category>
+      <command
+            id="aldor.project.wizard.newfile"
+            name="Aldor Source File">
+      </command>
    </extension>
 
 </plugin>
