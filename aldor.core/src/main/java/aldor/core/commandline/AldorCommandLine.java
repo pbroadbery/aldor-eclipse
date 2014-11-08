@@ -105,6 +105,8 @@ public class AldorCommandLine {
 		AliasedLibraryOption(String libName, IPath path) {
 			this.libName = libName;
 			this.path = path;
+			if (libName == null || libName.length() == 0)
+				throw new RuntimeException("Empty library name");
 		}
 
 		@Override
