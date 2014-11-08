@@ -23,14 +23,14 @@ public class AldorNewSourceFile extends Wizard implements INewWizard {
 	    _workbench = workbench;
 	    _selection = selection;
 	}
-	
+
 	@Override
 	public boolean performFinish() {
 	    boolean result = false;
-	 
+
 	    IFile file = _pageOne.createNewFile();
 	    result = file != null;
-	 
+
 	    if (result) {
 	        try {
 	            IDE.openEditor(_workbench.getActiveWorkbenchWindow().getActivePage(), file);
@@ -38,18 +38,16 @@ public class AldorNewSourceFile extends Wizard implements INewWizard {
 	            e.printStackTrace();
 	        }
 	    } // else no file created...result == false
-	 
+
 	    return result;
 	}
-	
+
 	@Override
 	public void addPages() {
 	    super.addPages();
-	 
+
 	    _pageOne = new WizardNewAldorSourceFileCreationPage(_selection);
-	 
+
 	    addPage(_pageOne);
 	}
-	 
-	
 }
