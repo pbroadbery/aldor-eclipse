@@ -1,13 +1,17 @@
 package aldor.project.wizard.aldorsource;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 public class AldorNewSourceFile extends Wizard implements INewWizard {
 	private WizardNewFileCreationPage _pageOne;
@@ -33,7 +37,13 @@ public class AldorNewSourceFile extends Wizard implements INewWizard {
 
 	    if (result) {
 	        try {
-	            IDE.openEditor(_workbench.getActiveWorkbenchWindow().getActivePage(), file);
+	            IEditorPart editor = IDE.openEditor(_workbench.getActiveWorkbenchWindow().getActivePage(), file);
+	            if (editor instanceof ITextEditor) {
+	            	ITextEditor textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
+	            	IDocumentProvider provider = textEditor.getDocumentProvider();
+	            	IDocument document = provider.getDocument(editor.getEditorInput());
+	            	textEditor.selectAndReveal(document.getLength(), 0);
+	            }
 	        } catch (PartInitException e) {
 	            e.printStackTrace();
 	        }
