@@ -35,6 +35,11 @@
             </or>
          </triggerPoints>
       </navigatorContent>
+      <commonWizard
+            type="new"
+            wizardId="aldor.project.wizard.aldorsource">
+         <enablement></enablement>
+      </commonWizard>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">
