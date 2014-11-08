@@ -25,3 +25,5 @@ Import-Package: aldor.core,
 Export-Package: aldor.project.builder,
  aldor.project.properties,
  aldor.utils.ui
+Bundle-Activator: aldor.project.AldorProjectActivator
+Bundle-ActivationPolicy: lazy
