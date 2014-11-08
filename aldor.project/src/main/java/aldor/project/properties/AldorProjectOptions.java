@@ -79,8 +79,4 @@ public class AldorProjectOptions {
 		}
 		return value;
 	}
-	public <T> void put(AldorPreference<T> preference, T value) {
-		valueForPreference.put(preference, value);
-	}
-	
 }

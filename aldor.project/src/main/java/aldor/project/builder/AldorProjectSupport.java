@@ -1,42 +1,93 @@
 package aldor.project.builder;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+
+import aldor.core.project.AldorPreferenceModel;
+import aldor.core.project.AldorPreferenceModel.AldorPreference;
+import aldor.project.properties.AldorPreferenceUIField;
+import aldor.project.properties.AldorPreferenceUIFields;
 
 public class AldorProjectSupport {
+	private static final AldorPreferenceModel preferenceModel = AldorPreferenceModel.instance();
+
 	/**
 	 * For this project we need to: - create the default Eclipse project - add
 	 * the custom project nature - create the folder structure
 	 *
 	 * @param projectName
 	 * @param location
+	 * @param preferences
 	 * @param natureId
 	 * @return
 	 */
-	public static IProject createProject(String projectName, URI location) {
+	public static IProject createProject(String projectName, URI location, IPreferenceStore preferences) {
         Assert.isNotNull(projectName);
         Assert.isTrue(projectName.trim().length() > 0);
- 
+
         IProject project = createBaseProject(projectName, location);
         try {
             addNature(project);
- 
-            String[] paths = { "src/aldor", "generated-files/ao", "generated-files/java", "bin" };
+
+            String[] paths = { "src/aldor",
+            					"bin",
+            					preferenceModel.intermediateFileLocation.preference(preferences),
+            					preferenceModel.javaFileLocation.preference(preferences),
+            					preferenceModel.aldorSourceFilePath.preference(preferences),
+            					};
             addToProjectStructure(project, paths);
+            createIncludeFile(project, preferenceModel.aldorSourceFilePath.preference(preferences), preferenceModel.includeFileName.preference(preferences));
+            setProjectPreferences(project, preferences);
         } catch (CoreException e) {
             e.printStackTrace();
             project = null;
         }
- 
+
         return project;
     }
+
+	private static void setProjectPreferences(final IProject project, final IPreferenceStore preferences) {
+		IPreferenceStore projectPreferences = AldorProjectSupport.getPreferenceStore(project);
+		for (AldorPreference<?> preference: preferenceModel.all()) {
+			projectPreferences.setValue(preference.name(), preference.preference(preferences));
+		}
+	}
+
+	private static void createIncludeFile(IProject project, String path, String includeFileName) {
+		if (includeFileName.length() == 0) {
+			return;
+		}
+		IFolder folder = project.getFolder(Path.fromPortableString(path));
+		IFile file = folder.getFile(includeFileName);
+		String text = "-- Include file for the " + project.getName() +" project."
+					+ "-- it is expected that it will be included in all source files that\n"
+					+ "-- make up this project.\n"
+					+ "#if BUILD_" + project.getName() + "\n"
+					+ "#else" + "\n"
+					+ "#library " + project.getName() + " \"lib"+project.getName() + ".al\"" + "\n"
+					+ "#endif" + "\n";
+
+		InputStream source = new ByteArrayInputStream(text.getBytes());
+		try {
+			file.create(source, true, null);
+		} catch (CoreException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	/**
 	 * Just do the basics: create a basic project.
@@ -47,14 +98,14 @@ public class AldorProjectSupport {
 	private static IProject createBaseProject(String projectName, URI location) {
         // it is acceptable to use the ResourcesPlugin class
         IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
- 
+
         if (!newProject.exists()) {
             URI projectLocation = location;
             IProjectDescription desc = newProject.getWorkspace().newProjectDescription(newProject.getName());
             if (location != null && ResourcesPlugin.getWorkspace().getRoot().getLocationURI().equals(location)) {
                 projectLocation = null;
             }
- 
+
             desc.setLocationURI(projectLocation);
             try {
                 newProject.create(desc, null);
@@ -65,7 +116,7 @@ public class AldorProjectSupport {
                 e.printStackTrace();
             }
         }
- 
+
         return newProject;
     }
 
@@ -89,8 +140,10 @@ public class AldorProjectSupport {
 	 */
 	private static void addToProjectStructure(IProject newProject, String[] paths) throws CoreException {
 		for (String path : paths) {
-			IFolder etcFolders = newProject.getFolder(path);
-			createFolder(etcFolders);
+			if (!path.isEmpty()) {
+				IFolder folders = newProject.getFolder(path);
+				createFolder(folders);
+			}
 		}
 	}
 
@@ -105,6 +158,34 @@ public class AldorProjectSupport {
 
 			project.setDescription(description, null);
 		}
-				
+
+	}
+
+	public static AldorPreferenceUIFields uiFields(IProject project) throws CoreException {
+		return aldorNature(project).uiFields();
+	}
+
+	public static AldorNature aldorNature(IProject project) throws CoreException {
+		return (AldorNature) project.getNature(AldorNature.NATURE_ID);
+	}
+
+	public static IPreferenceStore getPreferenceStore(IProject project) {
+		try {
+			AldorPreferenceUIFields uiFields = uiFields(project);
+			ProjectScope scope = new ProjectScope(project);
+			ScopedPreferenceStore preferenceStore = new ScopedPreferenceStore(scope, AldorNature.NATURE_ID);
+
+			for (AldorPreferenceUIField<?> field : uiFields.all()) {
+				String defaultStringValue = field.defaultStringValue();
+				if (defaultStringValue != null) {
+					preferenceStore.setDefault(field.name(), defaultStringValue);
+				}
+			}
+
+			return preferenceStore;
+		} catch (CoreException e) {
+			return null;
+
+		}
 	}
 }

@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.ui.console;bundle-version="3.5.200",
  com.google.guava;bundle-version="15.0.0",
  aldor.dependency.core,
- org.eclipse.ui.ide;bundle-version="3.10.1"
+ org.eclipse.ui.ide;bundle-version="3.10.1",
+ org.eclipse.swt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: aldor.core,
  aldor.core.commandline,
@@ -22,7 +23,8 @@ Import-Package: aldor.core,
  com.google.common.collect,
  com.google.common.io,
  org.eclipse.jface.text
-Export-Package: aldor.project.builder,
+Export-Package: aldor.project,
+ aldor.project.builder,
  aldor.project.properties,
  aldor.utils.ui
 Bundle-Activator: aldor.project.AldorProjectActivator

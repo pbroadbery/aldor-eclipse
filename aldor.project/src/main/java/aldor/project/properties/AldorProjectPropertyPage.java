@@ -1,10 +1,10 @@
 package aldor.project.properties;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -12,15 +12,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchPropertyPage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import aldor.core.project.AldorPreferenceModel;
-import aldor.project.builder.AldorNature;
-import aldor.utils.ui.OptionalFieldEditor;
+import aldor.project.builder.AldorProjectSupport;
 
 public class AldorProjectPropertyPage extends FieldEditorPreferencePage implements IWorkbenchPropertyPage {
 	IAdaptable element;
-	private AldorPreferenceUIFields uiFields;
 
 	public AldorProjectPropertyPage() {
 		super(GRID);
@@ -39,49 +36,29 @@ public class AldorProjectPropertyPage extends FieldEditorPreferencePage implemen
 	@Override
 	protected IPreferenceStore doGetPreferenceStore() {
 		IProject project = getProject();
-		try {
-			AldorPreferenceUIFields uiFields = uiFields();
-			ProjectScope scope = new ProjectScope(project);
-			ScopedPreferenceStore preferenceStore = new ScopedPreferenceStore(scope, AldorNature.NATURE_ID);
+		return AldorProjectSupport.getPreferenceStore(project);
 
-			for (AldorPreferenceUIField<?> field : uiFields.all()) {
-				String defaultStringValue = field.defaultStringValue();
-				if (defaultStringValue != null) {
-					preferenceStore.setDefault(field.name(), defaultStringValue);
-				}
-			}
-
-			return preferenceStore;
-		} catch (CoreException e) {
-			return null;
-		}
-
-	}
-
-	private AldorPreferenceUIFields uiFields() throws CoreException {
-		if (this.uiFields == null) {
-			this.uiFields = getAldorNature().uiFields();
-		}
-		return uiFields;
 	}
 
 	@Override
 	protected void createFieldEditors() {
 		AldorPreferenceModel preferences = AldorPreferenceModel.instance();
 		AldorPreferenceUIField<?> aldorPathUI;
+		AldorPreferenceUIFields uiFields = null;
 		try {
-			aldorPathUI = uiFields().uiFieldForPreference(preferences.executableLocation);
+			uiFields = AldorProjectSupport.uiFields(getProject());
+			aldorPathUI = AldorProjectSupport.uiFields(getProject()).uiFieldForPreference(preferences.executableLocation);
 		} catch (CoreException e) {
 			throw new RuntimeException("Failed to create preferences");
 		}
-		final OptionalFieldEditor aldorPath = new OptionalFieldEditor(aldorPathUI.title, aldorPathUI.name(), getFieldEditorParent());
+		final FieldEditor aldorPath = aldorPathUI.fieldEditor(getFieldEditorParent());
 		addField(aldorPath);
 
 		AldorPreferenceUIField<?> aldorOptionsUI = uiFields.uiFieldForPreference(preferences.aldorOptions);
 		final StringFieldEditor aldorOptions= new StringFieldEditor(aldorOptionsUI.name(), aldorOptionsUI.name(), getFieldEditorParent());
 		addField(aldorOptions);
 
-		
+
 		AldorPreferenceUIField<?> intermediateFileLocationUI = uiFields.uiFieldForPreference(preferences.intermediateFileLocation);
 		final StringFieldEditor intermediateFileLocation= new StringFieldEditor(intermediateFileLocationUI.name(), intermediateFileLocationUI.name(), getFieldEditorParent());
 		addField(intermediateFileLocation);
@@ -114,10 +91,6 @@ public class AldorProjectPropertyPage extends FieldEditorPreferencePage implemen
 		System.out.println("Adapter: " + getElement() +"  " + getElement().getAdapter(IProject.class));
 		IProject project = (IProject) getElement().getAdapter(IProject.class);
 		return project;
-	}
-
-	private AldorNature getAldorNature() throws CoreException {
-		return (AldorNature) getProject().getNature(AldorNature.NATURE_ID);
 	}
 
 }

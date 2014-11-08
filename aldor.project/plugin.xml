@@ -132,7 +132,7 @@
       <page
             class="aldor.project.properties.AldorProjectPropertyPage"
             id="aldor.project.properties.samplePropertyPage"
-            name="Aldor Project Page"
+            name="Aldor"
             >
          <enabledWhen>
              <adapt type="org.eclipse.core.resources.IProject">
@@ -154,6 +154,20 @@
 Contains all your good stuff
          </description>
       </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="aldor.project.preferences.AldorPreferencePage"
+            id="aldor.project.preferences.AldorPreferencePage"
+            name="Aldor Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="aldor.project.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

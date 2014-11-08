@@ -86,7 +86,7 @@ public class AldorNature implements IProjectNature {
 	@Override
 	public void setProject(IProject project) {
 		this.project = project;
-		uiFields = new AldorPreferenceUIFields(project);
+		uiFields = new AldorPreferenceUIFields(project.getName());
 	}
 
 	public AldorPreferenceUIFields uiFields() {
