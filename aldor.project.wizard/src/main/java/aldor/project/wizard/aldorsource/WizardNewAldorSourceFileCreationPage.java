@@ -18,7 +18,7 @@ public class WizardNewAldorSourceFileCreationPage extends WizardNewFileCreationP
  
     @Override
     protected InputStream getInitialContents() {
-        String content = "#include \"incl.as\""; // FIXME - should check project default (if any)
+        String content = "#include \"incl.as\"\n"; // FIXME - should check project default (if any)
         return new ByteArrayInputStream(content.getBytes());
     }
 }
