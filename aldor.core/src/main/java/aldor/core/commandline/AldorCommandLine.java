@@ -56,6 +56,9 @@ public class AldorCommandLine {
 		this.optionList.add(new RunOption(interpType));
 	}
 
+	public void define(String symbol) {
+		this.optionList.add(new DefineOption(symbol));
+	}
 
 	private static String toCommandString(AldorOption option, Augment augment, String value) {
 		return "-" + option.abbrev() + augment.id() + "=" + value;
@@ -180,6 +183,20 @@ public class AldorCommandLine {
 		}
 	}
 
+	private final class DefineOption implements Option {
+		String symbol;
+
+		public DefineOption(String symbol) {
+			this.symbol = symbol;
+		}
+
+		@Override
+		public String toCommandString() {
+			return "-" + AldorOption.Define.abbrev() + symbol;
+		}
+
+	}
+
 	public String toCommandString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.executablePath.toOSString());
@@ -209,7 +226,7 @@ public class AldorCommandLine {
 	}
 
 	static enum AldorOption {
-		File("F"), Library("l"), LibraryPath("Y"), OptimisationLevel("Q"), Run("G");
+		Define("D"), File("F"), Library("l"), LibraryPath("Y"), OptimisationLevel("Q"), Run("G");
 
 		private String abbrev;
 
