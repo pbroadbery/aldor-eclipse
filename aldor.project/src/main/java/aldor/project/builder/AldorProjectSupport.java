@@ -76,6 +76,7 @@ public class AldorProjectSupport {
 		String text = "-- Include file for the " + project.getName() +" project."
 					+ "-- it is expected that it will be included in all source files that\n"
 					+ "-- make up this project.\n"
+					+ "--NOBUILD\n"
 					+ "#if BUILD_" + project.getName() + "\n"
 					+ "#else" + "\n"
 					+ "#library " + project.getName() + " \"lib"+project.getName() + ".al\"" + "\n"
