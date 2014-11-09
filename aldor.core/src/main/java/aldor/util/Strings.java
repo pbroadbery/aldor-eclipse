@@ -19,14 +19,14 @@ public class Strings {
 	public static Strings instance() {
 		return instance ;
 	}
-	
+
 	private Strings() {
 		populate();
 	}
-	
+
 	private void populate() {
 		assert stringCodecForClass.isEmpty();
-		
+
 		stringCodecFor(String.class, new StringCodec<String>() {
 			@Override
 			public String decode(String to) {
