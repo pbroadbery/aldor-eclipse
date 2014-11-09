@@ -1,6 +1,8 @@
 package aldor.project.wizard;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -39,7 +41,8 @@ public class AldorProjectNewWizard extends Wizard implements INewWizard, IExecut
 		public void pageChanged(PageChangedEvent event) {
 			_pageTwo.updateFieldValues();
 		}};
-	public AldorProjectNewWizard() {
+
+		public AldorProjectNewWizard() {
 		setWindowTitle(WIZARD_NAME);
 	}
 
@@ -55,6 +58,7 @@ public class AldorProjectNewWizard extends Wizard implements INewWizard, IExecut
 	    if (!_pageOne.useDefaults()) {
 	        location = _pageOne.getLocationURI();
 	    } // else location == null
+	    _pageTwo.storeFields();
 	    _pageTwo.updateFieldValues();
 	    IPreferenceStore preferences = _pageTwo.getPreferences();
 	    AldorProjectSupport.createProject(name, location, preferences);
@@ -99,12 +103,25 @@ public class AldorProjectNewWizard extends Wizard implements INewWizard, IExecut
 		}
 
 		public void updateFieldValues() {
+			List<FieldEditor> defaultFields = new ArrayList<>();
+			for (FieldEditor fieldEditor: super.getFieldEditors()) {
+				if (fieldEditor.presentsDefaultValue()) {
+					defaultFields.add(fieldEditor);
+				}
+			}
 			uiFields = new AldorPreferenceUIFields(_pageOne.getProjectName());
 			for (AldorPreferenceUIField<?> field: uiFields.all() ) {
-				if (field.defaultStringValue() != null)
+				if (field.defaultStringValue() != null) {
 					getPreferences().setDefault(field.name(), field.defaultStringValue());
+				}
 			}
-			super.loadDefaults();
+			for (FieldEditor fe: defaultFields) {
+				fe.loadDefault();
+			}
+			for (FieldEditor fe: super.getFieldEditors()) {
+				if (!defaultFields.contains(fe))
+					fe.load();
+			}
 		}
 
 		@Override

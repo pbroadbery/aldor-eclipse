@@ -47,6 +47,19 @@ abstract class FieldWizardPage extends WizardPage {
 		for (FieldEditor fe: fieldEditors) {
 			fe.loadDefault();
 		}
+	}
+
+	protected final void load() {
+		for (FieldEditor fe: fieldEditors) {
+			fe.load();
+		}
+	}
+
+	public final void storeFields() {
+		for (FieldEditor fe: fieldEditors) {
+			fe.store();
+			System.out.println("Saving field: " + fe.getLabelText() + " " + getPreferences().getString(fe.getPreferenceName()));
+		}
 
 	}
 
@@ -59,5 +72,9 @@ abstract class FieldWizardPage extends WizardPage {
 
 	Composite getFieldEditorParent() {
 		return fieldEditorParent;
+	}
+
+	public Iterable<FieldEditor> getFieldEditors() {
+		return fieldEditors;
 	}
 }
