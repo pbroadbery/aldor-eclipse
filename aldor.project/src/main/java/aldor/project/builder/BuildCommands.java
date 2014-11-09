@@ -209,6 +209,7 @@ public class BuildCommands {
 		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
 		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
 		commandLine.inputFilePath(file.getLocation());
+		commandLine.define("BUILD_" + project().getName());
 		if (this.targetLibraryName() != null) {
 			commandLine.addLibrary(this.targetLibraryName(), this.archiveFileName(file));
 		}
