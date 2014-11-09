@@ -7,12 +7,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.junit.Test;
 
-import com.google.common.base.Optional;
-
 import aldor.util.event.EventAdapter;
 import aldor.utils.ui.Controls;
 import aldor.utils.ui.Controls.OptionalStringControl;
 
+import com.google.common.base.Optional;
 public class PreferencePageTest {
 	@Test
 	public void testFoo() {
@@ -46,7 +45,7 @@ public class PreferencePageTest {
 		
 		@Override
 		protected Control createContents(Composite parent) {
-			optionalString = Controls.createOptionalString("");
+			optionalString = Controls.createOptionalString("", null);
 			optionalString.valueSource().addListener(new EventAdapter<Optional<String>>() {
 				@Override
 				public void onEvent(Optional<String> event) {
@@ -55,6 +54,6 @@ public class PreferencePageTest {
 			});
 			return optionalString.createControl(parent);
 		}
-		
+
 	}
 }
