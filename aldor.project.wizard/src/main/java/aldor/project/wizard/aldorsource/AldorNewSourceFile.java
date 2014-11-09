@@ -18,6 +18,7 @@ public class AldorNewSourceFile extends Wizard implements INewWizard {
 
 	private IWorkbench _workbench;
 	private IStructuredSelection _selection;
+
 	public AldorNewSourceFile() {
 		setWindowTitle("New Aldor Source File");
 	}
@@ -56,7 +57,7 @@ public class AldorNewSourceFile extends Wizard implements INewWizard {
 	public void addPages() {
 	    super.addPages();
 
-	    _pageOne = new WizardNewAldorSourceFileCreationPage(_selection);
+	    _pageOne = new WizardNewAldorSourceFileCreationPage(_workbench, _selection);
 
 	    addPage(_pageOne);
 	}

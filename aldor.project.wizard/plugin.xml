@@ -22,6 +22,12 @@
             icon="src/main/icons/logo-16.png"
             id="aldor.project.wizard.aldorsource"
             name="Aldor Source File">
+         <selection
+               class="org.eclipse.core.resources.IProject">
+         </selection>
+         <selection
+               class="org.eclipse.core.resources.IFile">
+         </selection>
       </wizard>
    </extension>
    <extension
