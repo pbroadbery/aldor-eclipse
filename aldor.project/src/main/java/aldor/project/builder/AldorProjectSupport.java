@@ -1,6 +1,7 @@
 package aldor.project.builder;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -9,13 +10,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.eclipse.jface.preference.PreferenceStore;
 
 import aldor.core.project.AldorPreferenceModel;
 import aldor.core.project.AldorPreferenceModel.AldorPreference;
@@ -50,7 +51,9 @@ public class AldorProjectSupport {
             					preferenceModel.aldorSourceFilePath.preference(preferences),
             					};
             addToProjectStructure(project, paths);
-            createIncludeFile(project, preferenceModel.aldorSourceFilePath.preference(preferences), preferenceModel.includeFileName.preference(preferences));
+            createIncludeFile(project,
+            					preferenceModel.aldorSourceFilePath.preference(preferences),
+            					preferenceModel.includeFileName.preference(preferences));
             setProjectPreferences(project, preferences);
         } catch (CoreException e) {
             e.printStackTrace();
@@ -65,6 +68,7 @@ public class AldorProjectSupport {
 		for (AldorPreference<?> preference: preferenceModel.all()) {
 			projectPreferences.setValue(preference.name(), preference.preference(preferences));
 		}
+		savePreferenceStore(projectPreferences);
 	}
 
 	private static void createIncludeFile(IProject project, String path, String includeFileName) {
@@ -171,10 +175,13 @@ public class AldorProjectSupport {
 	}
 
 	public static IPreferenceStore getPreferenceStore(IProject project) {
+
 		try {
+			// This is slightly confusing.. obtain a preference store from disk, and add some default
+			// values to it.
 			AldorPreferenceUIFields uiFields = uiFields(project);
-			ProjectScope scope = new ProjectScope(project);
-			ScopedPreferenceStore preferenceStore = new ScopedPreferenceStore(scope, AldorNature.NATURE_ID);
+			IPath preferencesFile = project.getLocation().append(".aldorsettings");
+			final PreferenceStore preferenceStore = new PreferenceStore(preferencesFile.toOSString());
 
 			for (AldorPreferenceUIField<?> field : uiFields.all()) {
 				String defaultStringValue = field.defaultStringValue();
@@ -182,11 +189,28 @@ public class AldorProjectSupport {
 					preferenceStore.setDefault(field.name(), defaultStringValue);
 				}
 			}
+			if (preferencesFile.toFile().canRead())
+				preferenceStore.load();
 
 			return preferenceStore;
 		} catch (CoreException e) {
 			return null;
 
+		} catch (IOException e) {
+			return null;
 		}
 	}
+
+	public static void savePreferenceStore(IPreferenceStore preferenceStore) {
+		System.out.println("Saving preferences: "  + preferenceStore);
+		if (preferenceStore instanceof PreferenceStore) {
+			try {
+				((PreferenceStore) preferenceStore).save();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
 }
