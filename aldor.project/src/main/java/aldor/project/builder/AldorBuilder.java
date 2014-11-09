@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import aldor.core.AldorCore;
 import aldor.dependency.core.DelegatedDependencyState;
 import aldor.dependency.core.DependencyStates;
+import aldor.project.builder.DependencyScanner.ScanResult;
 import aldor.util.IFiles;
 import aldor.util.IPaths;
 
@@ -285,23 +286,24 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 		DependencyScanner scanner = new DependencyScanner();
 		Collection<IFile> filesToUpdate = new ArrayList<>(dependencyState.needsDependencyUpdate());
 		for (IFile file : filesToUpdate) {
-			List<String> scan;
 			try {
-				scan = scanner.scan(file);
-				Iterable<String> filtered = Iterables.filter(scan, new Predicate<String>() {
+				ScanResult scan = scanner.scan(file);
+				if (!scan.skipBuild()) {
+					Iterable<String> filtered = Iterables.filter(scan.dependencies(), new Predicate<String>() {
 
-					@Override
-					public boolean apply(String arg0) {
-						return dependencyState.isKnownName(arg0);
-					}
-				});
-				dependencyState.updateDependencies(file, filtered);
+						@Override
+						public boolean apply(String arg0) {
+							return dependencyState.isKnownName(arg0);
+						}
+					});
+					dependencyState.updateDependencies(file, filtered);
+				}
 			} catch (IOException e) {
 				throw new CoreException(AldorCore.createStatus("IO Error while scanning " + file, e));
 			}
 		}
 	}
-	
+
 	protected void incrementalBuild(final IResourceDelta delta, final IProgressMonitor monitor) throws CoreException {
 		// sort out dependency changes.
 		AldorDeltaVisitor visitor = new AldorDeltaVisitor();
@@ -311,10 +313,10 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 
 		delta.accept(visitor);
 		for (IFile file : visitor.removed()) {
-			dependencyState.aldorFileRemoved((IFile) file);
+			dependencyState.aldorFileRemoved(file);
 		}
 		for (IFile file : visitor.toBeChecked()) {
-			dependencyState.aldorFileChanged((IFile) file);
+			dependencyState.aldorFileChanged(file);
 		}
 		dependencyState.visitInBuildOrder(new Function<IFile, Boolean>() {
 
