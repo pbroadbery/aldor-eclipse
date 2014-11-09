@@ -13,11 +13,10 @@ import com.google.common.base.Optional;
 
 public class OptionalFieldEditor extends FieldEditor {
 
-	OptionalStringControl optionalStringControl = Controls.createOptionalString(null);
-	private String preferenceName;
+	private final OptionalStringControl optionalStringControl;
+	private final String preferenceName;
 	private Control control;
 	private final String tooltip;
-	private final String currentDefaultValue;
 
 	public OptionalFieldEditor(String preferenceName, String labelText, String labelTooltip, String currentDefaultValue, Composite parent) {
 		super();
@@ -25,7 +24,7 @@ public class OptionalFieldEditor extends FieldEditor {
 		super.setLabelText(labelText);
 		this.tooltip = labelTooltip;
 		this.preferenceName = preferenceName;
-		this.currentDefaultValue = currentDefaultValue;
+		optionalStringControl = Controls.createOptionalString(null, currentDefaultValue);
 		this.createControl(parent);
 	}
 
