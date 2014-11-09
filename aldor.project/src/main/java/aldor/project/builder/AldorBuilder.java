@@ -54,7 +54,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 			}, file);
 			return namesInOrder;
 		}
-		
+
 	}
 
 	public static final String BUILDER_ID = "aldor.project.AldorBuilder";
@@ -93,7 +93,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.internal.events.InternalBuilder#build(int,
 	 * java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
 	 */
@@ -268,7 +268,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 					if (isInterrupted()) {
 						return false;
 					}
-						
+
 					build(buildCommands, file, monitor);
 					dependencyState.built(dependencyState.getName(file));
 					return true;
@@ -322,7 +322,8 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 			public Boolean apply(IFile input) {
 				buildCommands.emitBuildPlan(input, "BuildDeps: " + dependencyState.prerequisites(input));
 				return true;
-			}});
+			}
+		});
 		buildCommands.emitBuildPlan(null, "PreDependencyUpdate: " + dependencyState);
 		this.updateDependencies(buildCommands);
 		buildCommands.emitBuildPlan(null, "PostDependencyUpdate: " + dependencyState);
