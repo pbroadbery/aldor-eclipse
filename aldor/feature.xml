@@ -9,12 +9,21 @@
    </description>
 
    <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+      It&apos;s code.  Enjoy it.
    </copyright>
 
    <license url="http://www.example.com/license">
-      [Enter License Description here.]
+      License will be one of Eclipse/Apache or GPL.
+
+Basically go wild, and if you add something, let aldor-devel
+know.
    </license>
+
+   <url>
+      <discovery label="Official Aldor WebSite" url="http://www.aldor.org"/>
+      <discovery label="GitHub for aldor source code" url="https://github.com/pippijn/aldor"/>
+      <discovery label="Aldor/Eclipse editor source" url="https://github.com/pbroadbery/aldor-eclipse"/>
+   </url>
 
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.10.0" match="greaterOrEqual"/>
@@ -67,5 +76,19 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
+
+   <plugin
+         id="aldor.customnavigator"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="aldor.project.wizard"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
