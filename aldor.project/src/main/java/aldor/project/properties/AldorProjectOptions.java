@@ -28,7 +28,12 @@ public class AldorProjectOptions {
 		for (AldorPreference<?> preference: preferenceModel.all()) {
 			String preferenceValue = preference.preference(projectPreferences);
 
-			valueForPreference.put(preference, preference.decode(preferenceValue));
+			try {
+				valueForPreference.put(preference, preference.decode(preferenceValue));
+			}
+			catch (RuntimeException e) {
+
+			}
 		}
 	}
 
