@@ -50,7 +50,7 @@ public class BuildCommands {
 	}
 
 	public void emitBuildPlan(final IFile file, final String status) {
-		MessageConsole console = findConsole("AldorCommand");
+		MessageConsole console = findAldorConsole();
 		final IOConsoleOutputStream outStream = console.newOutputStream();
 
 		Display.getDefault().syncExec(new Runnable() {
@@ -74,7 +74,7 @@ public class BuildCommands {
 		launcher.setProject(project());
 		launcher.showCommand(true);
 
-		MessageConsole messageConsole = findConsole("AldorCommand");
+		MessageConsole messageConsole = findAldorConsole();
 		IOConsoleOutputStream outputStream = messageConsole.newOutputStream();
 		ParsingOutputStream output = new ParsingOutputStream(outputStream);
 		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
@@ -148,7 +148,7 @@ public class BuildCommands {
 		launcher.setProject(project());
 		launcher.showCommand(true);
 
-		MessageConsole messageConsole = findConsole("AldorCommand");
+		MessageConsole messageConsole = findAldorConsole();
 		IOConsoleOutputStream outputStream = messageConsole.newOutputStream();
 		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
 
@@ -255,6 +255,19 @@ public class BuildCommands {
 	}
 
 
+	AldorCommandLine prepareCompileIntermediateToObjectCommandLine(IPath path, IPath objectPath) {
+		AldorProjectOptions options = new AldorProjectOptions();
+		options.load(project);
+		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
+		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		commandLine.inputFilePath(path);
+		commandLine.addOutput(FileType.Object, objectPath);
+
+		return commandLine;
+	}
+
+
+
 	public boolean confirmCanBuild() {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
@@ -292,6 +305,23 @@ public class BuildCommands {
 		return javaFile;
 	}
 
+
+	public IPath resultIntermediateLibraryFileName() {
+		IPath intermediateFileLocation = options.getOrDefault(preferences.intermediateFileLocation);
+		return intermediateFileLocation.append("lib" + project().getName() + ".al");
+	}
+
+	public IPath objectLibraryName() {
+		IPath intermediateFileLocation = options.getOrDefault(preferences.binaryFileLocation);
+		return intermediateFileLocation.append("lib" + project().getName() + ".a");
+	}
+
+
+	public IPath objectFileForIntermediate(IPath intermediatePath) {
+		IPath binaryFileLocation = options.getOrDefault(preferences.binaryFileLocation);
+		return binaryFileLocation.append(intermediatePath.addFileExtension(".o").lastSegment());
+	}
+
 	public String targetLibraryName() {
 		return this.options.getOrDefault(preferences.targetLibraryName);
 	}
@@ -312,7 +342,7 @@ public class BuildCommands {
 		launcher.setProject(project());
 		launcher.showCommand(true);
 
-		MessageConsole messageConsole = findConsole("AldorCommand");
+		MessageConsole messageConsole = findAldorConsole();
 		IOConsoleOutputStream outputStream = messageConsole.newOutputStream();
 		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
 
@@ -328,5 +358,71 @@ public class BuildCommands {
 		launcher.waitAndRead(outputStream, errorStream, monitor);
 	}
 
+	public void createIntermediateLibrary(IProgressMonitor monitor, IPath archiveFileName, List<IPath> intermediatePaths) throws CoreException {
+		createLibrary(monitor, archiveFileName, intermediatePaths);
+	}
+
+	private void createLibrary(IProgressMonitor monitor, IPath archiveFileName, List<IPath> intermediatePaths) throws CoreException {
+		if (archiveFileName.toFile().exists())
+			archiveFileName.toFile().delete();
+		IPaths.createDirectoryForPath(project.getFile(archiveFileName).getLocation().removeLastSegments(1));
+		ICommandLauncher launcher = new CommandLauncher();
+		launcher.setProject(project());
+		launcher.showCommand(true);
+
+		MessageConsole messageConsole = findAldorConsole();
+		IOConsoleOutputStream outputStream = messageConsole.newOutputStream();
+		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
+
+		ArCommandLine commandLine = new ArCommandLine(new Path("ar"));
+		commandLine.archiveName(archiveFileName);
+		commandLine.addFiles(intermediatePaths);
+
+		OutputStreams.writeSafely(outputStream, "[AR] " + commandLine.toCommandString() + "\n");
+
+		Process p = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
+				monitor);
+		if (p == null) {
+			return;
+		}
+
+		OutputStreams.forceClose(p.getOutputStream());
+
+		launcher.waitAndRead(outputStream, errorStream, monitor);
+	}
+
+	public void buildObjectFile(IPath intermediateFile, IProgressMonitor monitor) throws CoreException {
+		IPath objectFile= this.objectFileForIntermediate(intermediateFile);
+		AldorCommandLine commandLine = this.prepareCompileIntermediateToObjectCommandLine(intermediateFile, objectFile);
+
+		IPaths.createDirectoryForPath(project.getFile(objectFile).getLocation().removeLastSegments(1));
+		ICommandLauncher launcher = new CommandLauncher();
+		launcher.setProject(project());
+		launcher.showCommand(true);
+
+		MessageConsole messageConsole = findAldorConsole();
+		IOConsoleOutputStream outputStream = messageConsole.newOutputStream();
+		IOConsoleOutputStream errorStream = messageConsole.newOutputStream();
+
+		OutputStreams.writeSafely(outputStream, "[AO->O] " + commandLine.toCommandString() + "\n");
+
+		Process p = launcher.execute(commandLine.executablePath(), commandLine.arguments(), new String[0]/* env */, project().getLocation() /* cwd */,
+				monitor);
+		if (p == null) {
+			return;
+		}
+
+		OutputStreams.forceClose(p.getOutputStream());
+
+		launcher.waitAndRead(outputStream, errorStream, monitor);
+	}
+
+	public static MessageConsole findAldorConsole() {
+		return findConsole("AldorCommand");
+	}
+
+	public void createObjectLibrary(IProgressMonitor monitor, IPath archiveFileName, List<IPath> objectFiles) throws CoreException {
+		createLibrary(monitor, archiveFileName, objectFiles);
+	}
 
 }

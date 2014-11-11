@@ -275,6 +275,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 					return true;
 				}
 			});
+			buildIntermediateLibrary(buildCommands, monitor);
 		} catch (CoreException e) {
 			AldorCore.log(e);
 			throw e;
@@ -333,7 +334,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 		final int total = countIncrementalWork();
 		// and build
 		monitor.beginTask("Incremental build", total);
-		dependencyState.visitInBuildOrderForBuild(new Function<IFile, Boolean>() {
+		boolean result = dependencyState.visitInBuildOrderForBuild(new Function<IFile, Boolean>() {
 
 			@Override
 			public Boolean apply(IFile file) {
@@ -344,6 +345,43 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 				return true;
 			}
 		});
+
+		if (total > 0 && result) {
+			buildIntermediateLibrary(buildCommands, monitor);
+			buildObjectLibrary(buildCommands, monitor);
+		}
+	}
+
+	private void buildObjectLibrary(final BuildCommands buildCommands, final IProgressMonitor monitor) throws CoreException {
+		final List<IPath> intermediateFiles = new ArrayList<>();
+		final List<IPath> objectFiles = new ArrayList<>();
+		dependencyState.visitInBuildOrder(new Function<IFile, Boolean>() {
+
+			@Override
+			public Boolean apply(IFile input) {
+				intermediateFiles.add(buildCommands.intermediateFileName(input));
+				return true;
+			}});
+
+		for (IPath intermediatePath: intermediateFiles) {
+			IPath objectFile = buildCommands.objectFileForIntermediate(intermediatePath);
+			objectFiles.add(objectFile);
+			buildCommands.buildObjectFile(objectFile, monitor);
+		}
+
+		buildCommands.createObjectLibrary(monitor, buildCommands.objectLibraryName(), objectFiles);
+	}
+
+	private void buildIntermediateLibrary(final BuildCommands buildCommands, IProgressMonitor monitor) throws CoreException {
+		final List<IPath> intermediateFiles = new ArrayList<>();
+		dependencyState.visitInBuildOrder(new Function<IFile, Boolean>() {
+
+			@Override
+			public Boolean apply(IFile input) {
+				intermediateFiles.add(buildCommands.intermediateFileName(input));
+				return true;
+			}});
+		buildCommands.createIntermediateLibrary(monitor, buildCommands.resultIntermediateLibraryFileName(), intermediateFiles);
 	}
 
 	private int countIncrementalWork() {
