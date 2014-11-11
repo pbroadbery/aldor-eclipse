@@ -8,9 +8,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import aldor.util.Strings;
 
-public class AldorPreferenceModel {	
+public class AldorPreferenceModel {
 	static final private AldorPreferenceModel instance = new AldorPreferenceModel();
-	
+
 	List<AldorPreference<?>> all = new LinkedList<AldorPreference<?>>();
 
 	public final AldorPreference<IPath> executableLocation = new AldorPreference<>(IPath.class, "executableLocation");
@@ -23,15 +23,16 @@ public class AldorPreferenceModel {
 	public final AldorPreference<String> includeFileName = new AldorPreference<String>(String.class, "includeFileName");
 
 	public AldorPreference<IPath> aldorSourceFilePath = new AldorPreference<IPath>(IPath.class, "aldorSourceFilePath");
+	public AldorPreference<IPath> binaryFileLocation = new AldorPreference<IPath>(IPath.class, "binaryFileLocation");
 
 	public AldorPreferenceModel() {
-		
+
 	}
-	
+
 	public static AldorPreferenceModel instance() {
 		return instance;
 	}
-	
+
 	private void add(AldorPreference<?> aldorPreference) {
 		all.add(aldorPreference);
 	}
@@ -39,34 +40,36 @@ public class AldorPreferenceModel {
 	public class AldorPreference<T> {
 		Class<T> clss;
 		String name;
-		
+
 		AldorPreference(Class<T> clss, String name) {
 			this.name = name;
 			this.clss = clss;
 			add(this);
 		}
-		
+
 		public String name() {
 			return name;
 		}
-		
+
 		public String encode(T value) {
 			return Strings.instance().encode(clss, value);
 		}
-		
+
 		public T decode(String text) {
+			if (text == null)
+				return null;
 			return Strings.instance().decode(clss, text);
 		}
 
 		public Class<T> clss() {
 			return clss;
 		}
-		
+
 		@Override
 		public boolean equals(Object other) {
 			return this.name().equals(((AldorPreference<?>) other).name());
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return this.name().hashCode();
@@ -81,7 +84,7 @@ public class AldorPreferenceModel {
 		}
 
 	}
-	
+
 	enum DependencyStyle {
 		InFile, DependecyFile;
 	}
@@ -89,5 +92,5 @@ public class AldorPreferenceModel {
 	public List<AldorPreference<?>> all() {
 		return all;
 	}
-	
+
 }

@@ -45,7 +45,7 @@ public class AldorProjectSupport {
             addNature(project);
 
             String[] paths = { "src/aldor",
-            					"bin",
+            					preferenceModel.binaryFileLocation.preference(preferences),
             					preferenceModel.intermediateFileLocation.preference(preferences),
             					preferenceModel.javaFileLocation.preference(preferences),
             					preferenceModel.aldorSourceFilePath.preference(preferences),

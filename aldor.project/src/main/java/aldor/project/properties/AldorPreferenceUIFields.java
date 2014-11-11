@@ -10,14 +10,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.widgets.Composite;
 
-import com.google.common.base.Function;
-
 import aldor.core.project.AldorPreferenceModel;
 import aldor.core.project.AldorPreferenceModel.AldorPreference;
 import aldor.project.AldorProjectActivator;
-import aldor.project.properties.AldorPreferenceUIField.FieldEditorBuilder;
 import aldor.util.SafeCallable;
 import aldor.utils.ui.OptionalFieldEditor;
+
+import com.google.common.base.Function;
 
 public class AldorPreferenceUIFields {
 	private Set<AldorPreferenceUIField<?>> uiFields;
@@ -44,16 +43,11 @@ public class AldorPreferenceUIFields {
 		uiFields.add(new AldorPreferenceUIField<>(prefModel.targetLibraryName, "Target library name", projectName));
 		uiFields.add(new AldorPreferenceUIField<>(prefModel.includeFileName, "Include File Name", projectName + ".as"));
 		uiFields.add(new AldorPreferenceUIField<>(prefModel.aldorSourceFilePath, "Source file path", sourceFilePath()));
+		uiFields.add(new AldorPreferenceUIField<>(prefModel.binaryFileLocation, "Binary file path", binaryFilePath()));
 	}
 
 	private AldorPreferenceUIField<?> stringUIField(AldorPreference<String> item, String title, String defaultValue) {
 		AldorPreferenceUIField<String> field = new AldorPreferenceUIField<>(item, title, defaultValue);
-		field.fieldEditor(stringEditor(field));
-		return field;
-	}
-
-	private <T> AldorPreferenceUIField<T> stringUIField(AldorPreference<T> item, String title, SafeCallable<T> defaultValue) {
-		AldorPreferenceUIField<T> field = new AldorPreferenceUIField<>(item, title, defaultValue);
 		field.fieldEditor(stringEditor(field));
 		return field;
 	}
@@ -64,9 +58,14 @@ public class AldorPreferenceUIFields {
 		return field;
 	}
 
-	
+
 	private IPath sourceFilePath() {
 		return Path.fromPortableString("src/aldor");
+	}
+
+
+	private IPath binaryFilePath() {
+		return Path.fromPortableString("bin");
 	}
 
 	private SafeCallable<IPath> defaultExecutablePath() {
@@ -112,5 +111,5 @@ public class AldorPreferenceUIFields {
 
 	}
 
-	
+
 }
