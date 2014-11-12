@@ -166,7 +166,7 @@ Contains all your good stuff
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="aldor.project.preferences.PreferenceInitializer">
+            class="aldor.project.preferences.AldorPreferenceInitializer">
       </initializer>
    </extension>
 
