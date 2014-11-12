@@ -80,6 +80,15 @@
       </perspectiveExtension>
    </extension>
    <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="*">
+         <actionSet
+               id="org.eclipse.debug.ui.launchActionSet">
+         </actionSet>
+      </perspectiveExtension>
+   </extension>
+   <extension
          point="org.eclipse.ui.commands">
       <category
             id="aldor.project.wizard.category.aldor"
