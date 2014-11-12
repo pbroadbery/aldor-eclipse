@@ -25,6 +25,7 @@ Import-Package: aldor.core,
  org.eclipse.jface.text
 Export-Package: aldor.project,
  aldor.project.builder,
+ aldor.project.preferences,
  aldor.project.properties,
  aldor.utils.ui
 Bundle-Activator: aldor.project.AldorProjectActivator
