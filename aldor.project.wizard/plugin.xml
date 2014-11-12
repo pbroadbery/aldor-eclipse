@@ -17,6 +17,7 @@
             project="true">
       </wizard>
       <wizard
+            category="aldor.project.wizard"
             class="aldor.project.wizard.aldorsource.AldorNewSourceFile"
             descriptionImage="src/main/icons/logo-file-32.png"
             icon="src/main/icons/logo-16.png"
@@ -81,10 +82,11 @@
    <extension
          point="org.eclipse.ui.commands">
       <category
-            id="aldor.project.wizard.category1"
-            name="name">
+            id="aldor.project.wizard.category.aldor"
+            name="Aldor">
       </category>
       <command
+            categoryId="aldor.project.aldorNature.category"
             id="aldor.project.wizard.newfile"
             name="Aldor Source File">
       </command>
