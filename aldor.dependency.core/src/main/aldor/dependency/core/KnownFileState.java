@@ -1,7 +1,6 @@
 package aldor.dependency.core;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.collect.BiMap;
@@ -17,7 +16,6 @@ class KnownFileState<NamedObj extends INamed> {
 	KnownFileState() {
 		this.namedObjForString = HashBiMap.create();
 		this.duplicateNamedObj = HashMultimap.create();
-		this.notForBuildSet = new HashSet<>();
 	}
 
 	public boolean isKnownName(String name) {
