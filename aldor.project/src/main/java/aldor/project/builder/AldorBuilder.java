@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -25,6 +26,7 @@ import aldor.util.IFiles;
 import aldor.util.IPaths;
 
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -61,6 +63,8 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "aldor.project.AldorBuilder";
 	static public final String MARKER_TYPE = "aldor.project.aldorProblem";
 	private IFileDependencyState dependencyState;
+	private IPath lastAldorPath = null;
+	private IMarker noBuildMarker;
 
 	public AldorBuilder() {
 		this.dependencyState = new IFileDependencyState();
@@ -99,22 +103,39 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 	 * java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected IProject[] build(int kind, @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor) throws CoreException {
+	protected IProject[] build(final int kind, @SuppressWarnings("rawtypes") final Map args, final IProgressMonitor monitor) throws CoreException {
 
-		if (!(new BuildCommands(getProject())).confirmCanBuild())
+		IProject project = getProject();
+		if (this.noBuildMarker != null)
+			noBuildMarker.delete();
+		BuildCommands buildCommands = new BuildCommands(project);
+		if (!buildCommands.confirmCanBuild()) {
+			this.noBuildMarker = buildCommands.emitCannotBuildError();
 			return null;
+		}
 
-		if (kind == FULL_BUILD) {
-			fullBuild(monitor);
-		} else {
-			IResourceDelta delta = getDelta(getProject());
-			if (delta == null) {
-				fullBuild(monitor);
-			} else {
-				incrementalBuild(delta, monitor);
-			}
+		IResourceDelta delta = getDelta(getProject());
+		int actualKind = selectBuildType(kind, delta, buildCommands);
+
+		if (actualKind == FULL_BUILD) {
+			this.fullBuild(monitor);
+		}
+		else {
+			this.incrementalBuild(delta, monitor);
 		}
 		return null;
+	}
+
+	private int selectBuildType(int kind, IResourceDelta delta, BuildCommands buildCommands) {
+		if (kind != FULL_BUILD) {
+			if (Objects.equal(lastAldorPath, buildCommands.aldorExecutable())) {
+				kind = FULL_BUILD;
+			}
+			if (delta == null) {
+				kind = FULL_BUILD;
+			}
+		}
+		return kind;
 	}
 
 	@Override
