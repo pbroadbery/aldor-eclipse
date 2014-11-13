@@ -32,12 +32,12 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	@Override
 	public String toString() {
-		return "{DepState " + dependencyMap 
+		return "{DepState " + dependencyMap
 				+ " Files: " + fileState +" Rebuild: "+ needsRebuild + " depUpdate: " + needsDependencyUpdate + "}";
 	}
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see aldor.dependency.core.IDependencyState#aldorFileAdded(Named)
 	 */
 	@Override
@@ -53,7 +53,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see aldor.dependency.core.IDependencyState#aldorFileRemoved(Named)
 	 */
 	@Override
@@ -72,7 +72,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see aldor.dependency.core.IDependencyState#aldorFileChanged(Named)
 	 */
 	@Override
@@ -83,7 +83,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see aldor.dependency.core.IDependencyState#needsDependencyUpdate()
 	 */
 	@Override
@@ -99,7 +99,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see aldor.dependency.core.IDependencyState#updateDependencies(Named,
 	 * java.util.List)
 	 */
@@ -116,7 +116,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 				needsBuild = true;
 			}
 		}
-		
+
 		if (needsBuild)
 			this.needsRebuild.add(name);
 		this.needsDependencyUpdate.remove(name);
@@ -124,7 +124,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * aldor.dependency.core.IDependencyState#visitInBuildOrder(com.google.common
 	 * .base.Function)
@@ -185,6 +185,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		}
 	}
 
+	@Override
 	public boolean visitInBuildOrderForBuild(Function<Named, Boolean> function) {
 		dependencyMap.rebuild();
 		Map<String, Status> visited = new HashMap<String, Status>();
@@ -197,7 +198,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 			return false;
 		return true;
 	}
-	
+
 	private Status visitInBuildOrderForBuild0(Function<Named, Boolean> function, String name, Map<String, Status> visited) {
 		if (visited.containsKey(name))
 			return visited.get(name);
