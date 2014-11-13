@@ -211,9 +211,9 @@ public class BuildCommands {
 		commandLine.inputFilePath(file.getLocation());
 		commandLine.define("BUILD_" + project().getName());
 		if (this.targetLibraryName() != null) {
-			commandLine.addLibrary(this.targetLibraryName(), this.archiveFileName(file));
+			commandLine.addLibrary(this.targetLibraryName(), this.archiveFileName(file.getFullPath()));
 		}
-		IPath aoFile = intermediateFileName(file);
+		IPath aoFile = intermediateFileName(file.getFullPath());
 		commandLine.addOutput(AldorCommandLine.FileType.Intermediate, aoFile);
 		return commandLine;
 	}
@@ -286,22 +286,22 @@ public class BuildCommands {
 	}
 
 
-	public IPath intermediateFileName(IFile file) {
+	public IPath intermediateFileName(IPath path) {
 		IPath intermediateFileLocation = options.getOrDefault(preferences.intermediateFileLocation);
-		IPath aoFile = AldorCommandLine.outputNameForName(FileType.Intermediate, intermediateFileLocation, file.getName());
+		IPath aoFile = AldorCommandLine.outputNameForName(FileType.Intermediate, intermediateFileLocation, path.lastSegment());
 		return aoFile;
 	}
 
-	public IPath archiveFileName(IFile file) {
+	public IPath archiveFileName(IPath path) {
 		IPath intermediateFileLocation = options.getOrDefault(preferences.intermediateFileLocation);
 		String libName = options.getOrDefault(preferences.targetLibraryName);
-		IPath aoFile = intermediateFileLocation.append("lib" + libName +"_" + AldorCommandLine.nameForFileName(file.getName()) + ".al");
+		IPath aoFile = intermediateFileLocation.append("lib" + libName +"_" + AldorCommandLine.nameForFileName(path.lastSegment()) + ".al");
 		return aoFile;
 	}
 
-	public IPath javaFileName(IFile file) {
+	public IPath javaFileName(IPath file) {
 		IPath javaFileLocation = options.getOrDefault(preferences.javaFileLocation);
-		IPath javaFile = AldorCommandLine.outputNameForName(FileType.Java, javaFileLocation, file.getName());
+		IPath javaFile = AldorCommandLine.outputNameForName(FileType.Java, javaFileLocation, file.lastSegment());
 		return javaFile;
 	}
 
@@ -332,7 +332,7 @@ public class BuildCommands {
 
 	public void createTemporaryArchiveFile(IProgressMonitor monitor, IFile file, List<IPath> prerequisitePaths) throws CoreException {
 		ArCommandLine commandLine = new ArCommandLine(new Path("ar"));
-		IPath archiveFileName = archiveFileName(file);
+		IPath archiveFileName = archiveFileName(file.getFullPath());
 		if (archiveFileName.toFile().exists())
 			archiveFileName.toFile().delete();
 		IPaths.createDirectoryForPath(project.getFile(archiveFileName).getLocation().removeLastSegments(1));

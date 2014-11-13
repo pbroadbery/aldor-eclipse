@@ -151,7 +151,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 			assert resource instanceof IFile;
 			IFile file = (IFile) resource;
 			deleteMarkers(file);
-			IPath destPath = buildCommands.intermediateFileName(file);
+			IPath destPath = buildCommands.intermediateFileName(file.getFullPath());
 			try {
 				createTemporaryArchiveFile(monitor, buildCommands, file, destPath);
 				buildIntermediateFile(monitor, buildCommands, file, destPath);
@@ -181,8 +181,8 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 		List<IPath> prerequisitePaths = Lists.transform(prerequisites, new Function<IFile, IPath>() {
 
 			@Override
-			public IPath apply(IFile arg0) {
-				return buildCommands.intermediateFileName(arg0);
+			public IPath apply(IFile prereqFile) {
+				return buildCommands.intermediateFileName(prereqFile.getFullPath());
 			}
 		});
 
@@ -210,7 +210,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 			return;
 		}
 
-		IPath fileName = buildCommands.archiveFileName(file);
+		IPath fileName = buildCommands.archiveFileName(file.getFullPath());
 		fileName.toFile().delete();
 	}
 
@@ -231,7 +231,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 
 	private void buildJavaFile(IResource resource, IProgressMonitor monitor, BuildCommands buildCommands) throws CoreException {
 		IFile file = (IFile) resource;
-		IPath destPath = buildCommands.javaFileName(file);
+		IPath destPath = buildCommands.javaFileName(file.getFullPath());
 		IPaths.createDirectoryForPath(getProject().getFile(destPath).getLocation());
 		buildCommands.buildJavaFile((IFile) resource, monitor);
 		IFile destFile = getProject().getFile(destPath);
@@ -359,7 +359,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 
 			@Override
 			public Boolean apply(IFile input) {
-				intermediateFiles.add(buildCommands.intermediateFileName(input));
+				intermediateFiles.add(buildCommands.intermediateFileName(input.getFullPath()));
 				return true;
 			}});
 
@@ -378,7 +378,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 
 			@Override
 			public Boolean apply(IFile input) {
-				intermediateFiles.add(buildCommands.intermediateFileName(input));
+				intermediateFiles.add(buildCommands.intermediateFileName(input.getFullPath()));
 				return true;
 			}});
 		buildCommands.createIntermediateLibrary(monitor, buildCommands.resultIntermediateLibraryFileName(), intermediateFiles);
