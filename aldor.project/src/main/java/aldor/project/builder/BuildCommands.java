@@ -67,6 +67,11 @@ public class BuildCommands {
 					outStream.setColor(null);
 				}
 			}});
+		try {
+			outStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void buildIntermediateFile(final IFile file, IProgressMonitor monitor) throws CoreException {
@@ -103,16 +108,16 @@ public class BuildCommands {
 		launcher.waitAndRead(output, err, monitor);
 	}
 
-	private void addMarker(IResource resource, String message, int severity) {
+	private IMarker addMarker(IResource resource, String message, int severity) {
 		try {
 			IMarker marker = resource.createMarker(AldorBuilder.MARKER_TYPE);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 			marker.setAttribute(IMarker.MESSAGE, message);
+			return marker;
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
+			return null;
+		}
 	}
 
 	private void addMarker(IFile file, String message, int lineNumber, int severity) {
@@ -278,11 +283,20 @@ public class BuildCommands {
 		IPath path = options.getOrDefault(preferences.executableLocation);
 
 		if (!path.toFile().isFile()) {
-			addMarker(project, "Missing aldor executable " + path.toPortableString() + " (to set, go to project preferences)", IMarker.SEVERITY_ERROR);
 			return false;
 		}
 
 		return true;
+	}
+
+	public IMarker emitCannotBuildError() {
+		return addMarker(project, "Missing aldor executable: " + aldorExecutable() + " (to set, go to Project Properties, or Workspace Preferences)", IMarker.SEVERITY_ERROR);
+	}
+
+	public IPath aldorExecutable() {
+		AldorProjectOptions options = new AldorProjectOptions();
+		options.load(project);
+		return options.getOrDefault(preferences.executableLocation);
 	}
 
 
