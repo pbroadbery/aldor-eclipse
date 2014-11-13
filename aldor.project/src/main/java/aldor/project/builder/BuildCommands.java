@@ -333,7 +333,7 @@ public class BuildCommands {
 
 	public IPath objectFileForIntermediate(IPath intermediatePath) {
 		IPath binaryFileLocation = options.getOrDefault(preferences.binaryFileLocation);
-		return binaryFileLocation.append(intermediatePath.addFileExtension(".o").lastSegment());
+		return binaryFileLocation.append(intermediatePath.removeFileExtension().addFileExtension("o").lastSegment());
 	}
 
 	public String targetLibraryName() {
