@@ -11,13 +11,13 @@ public class ArCommandLine {
 	private final IPath executablePath;
 	private IPath archiveFile;
 	private final List<IPath> pathsToArchive;
-	
+
 	public ArCommandLine(IPath executablePath) {
 		this.executablePath = executablePath;
 		pathsToArchive = new LinkedList<IPath>();
-		
+
 	}
-	
+
 	public void addFile(IPath path) {
 		pathsToArchive.add(path);
 	}
@@ -25,23 +25,23 @@ public class ArCommandLine {
 	public void addFiles(Collection<? extends IPath> path) {
 		pathsToArchive.addAll(path);
 	}
-	
+
 	public String toCommandString() {
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append(executablePath.toOSString());
 		sb.append(" cr ");
 		sb.append(archiveFile.toOSString());
 		for (IPath path: pathsToArchive) {
 			sb.append(" " + path.toOSString());
 		}
-		
+
 		return sb.toString();
 	}
-	
+
 	public String[] arguments() {
 		List<String> args = new ArrayList<String>(pathsToArchive.size()+2);
-		
+
 		args.add("cr");
 		args.add(archiveFile.toOSString());
 		for (IPath path: pathsToArchive) {
