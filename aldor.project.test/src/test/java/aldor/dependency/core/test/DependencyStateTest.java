@@ -101,7 +101,7 @@ public class DependencyStateTest {
 		DefDataSet ds = new DefDataSet();
 		IDependencyState<String> depState = ds.depGraph();
 		assertTrue(depState.needsBuild("a"));
-		
+
 		depState.built("a");
 		assertFalse(depState.needsBuild("a"));
 	}
@@ -111,7 +111,7 @@ public class DependencyStateTest {
 		DefDataSet ds = new DefDataSet();
 		IDependencyState<String> depState = ds.depGraph();
 		DependencyStates.clearBuildOrder(depState);
-		
+
 		depState.aldorFileChanged("b");
 		assertTrue(depState.needsBuild("b"));
 	}
@@ -150,13 +150,13 @@ public class DependencyStateTest {
 		depState.updateDependencies("file1", Lists.newArrayList("file0"));
 		assertTrue(depState.needsBuild("file0"));
 		assertTrue(depState.needsBuild("file1"));
-		
+
 		Collection<String> toBuild = DependencyStates.buildOrderForBuild(depState);
 		assertEquals(toBuild, Lists.newArrayList("file0", "file1"));
 		DependencyStates.clearBuildOrder(depState);
 		assertFalse(depState.needsBuild("file0"));
 		assertFalse(depState.needsBuild("file1"));
-		
+
 	}
 
 	@Test
@@ -189,7 +189,7 @@ public class DependencyStateTest {
 		depState.aldorFileAdded("file2");
 
 		depState.updateDependencies("file1", Lists.newArrayList("file0"));
-	
+
 		Lists2.containsSubList(DependencyStates.buildOrderForBuild(depState), Lists.newArrayList("file0", "file1"));
 		DependencyStates.clearBuildOrder(depState);
 
