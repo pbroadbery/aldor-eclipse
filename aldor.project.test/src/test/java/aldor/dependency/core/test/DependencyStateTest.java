@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import aldor.dependency.core.DependencyStates;
 import aldor.dependency.core.IDependencyState;
+import aldor.project.testutils.Asserts;
 import aldor.util.Lists2;
 
 import com.google.common.base.Function;
@@ -206,5 +207,33 @@ public class DependencyStateTest {
 		DependencyStates.clearBuildOrder(depState);
 
 	}
-	
+
+	@Test
+	public void testDoNotBuild() {
+		IDependencyState<String> depState = new StringDependencyState();
+		depState.aldorFileAdded("file0");
+		depState.aldorFileAdded("file1");
+		depState.aldorFileAdded("file2");
+
+		depState.updateDependencies("file1", Lists.newArrayList("file0"));
+		depState.doNotBuild("file2");
+
+		Asserts.assertDoesNotContain("file2", DependencyStates.buildOrderForBuild(depState));
+	}
+
+
+	@Test
+	public void testDoNotBuild2() {
+		IDependencyState<String> depState = new StringDependencyState();
+		depState.aldorFileAdded("file0");
+		depState.aldorFileAdded("file1");
+
+		depState.doNotBuild("file2");
+
+		Asserts.assertDoesNotContain("file2", DependencyStates.buildOrderForBuild(depState));
+
+		System.out.println("" + depState.needsDependencyUpdate());
+	}
+
+
 }
