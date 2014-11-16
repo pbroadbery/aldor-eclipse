@@ -211,8 +211,7 @@ public class BuildCommands {
 	AldorCommandLine prepareBuildIntermediateCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
-		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		AldorCommandLine commandLine = new AldorCommandLine(this.executableLocation(options));;
 		commandLine.inputFilePath(file.getLocation());
 		commandLine.define("BUILD_" + project().getName());
 		if (this.targetLibraryName() != null) {
@@ -226,8 +225,7 @@ public class BuildCommands {
 	AldorCommandLine prepareBuildJavaCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
-		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		AldorCommandLine commandLine = new AldorCommandLine(this.executableLocation(options));
 		commandLine.inputFilePath(file.getLocation());
 		IPath javaFileLocation = options.getOrDefault(preferences.javaFileLocation);
 		IPath javaFile = AldorCommandLine.outputNameForName(FileType.Java, javaFileLocation, file.getName());
@@ -235,12 +233,10 @@ public class BuildCommands {
 		return commandLine;
 	}
 
-
 	AldorCommandLine prepareRunInterpOnIntermediateCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
-		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		AldorCommandLine commandLine = new AldorCommandLine(this.executableLocation(options));
 		commandLine.inputFilePath(file.getLocation());
 		commandLine.addRunType(AldorCommandLine.RunType.Interp);
 
@@ -251,8 +247,7 @@ public class BuildCommands {
 	AldorCommandLine prepareRunBinaryOnIntermediateCommandLine(IFile file) {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
-		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		AldorCommandLine commandLine = new AldorCommandLine(this.executableLocation(options));
 		commandLine.inputFilePath(file.getLocation());
 		commandLine.addRunType(AldorCommandLine.RunType.Run);
 		commandLine.addLibrary("aldor");
@@ -263,8 +258,7 @@ public class BuildCommands {
 	AldorCommandLine prepareCompileIntermediateToObjectCommandLine(IPath path, IPath objectPath) {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		IPath aldorExecutablePath = options.getOrDefault(preferences.executableLocation);
-		AldorCommandLine commandLine = new AldorCommandLine(aldorExecutablePath);
+		AldorCommandLine commandLine = new AldorCommandLine(this.executableLocation(options));
 		commandLine.inputFilePath(path);
 		commandLine.addOutput(FileType.Object, objectPath);
 
@@ -276,17 +270,21 @@ public class BuildCommands {
 	public boolean confirmCanBuild() {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		if (options.getOrDefault(preferences.executableLocation) == null) {
+		if (executableLocation(options) == null) {
 			addMarker(project, "Missing aldor executable (to set, go to project preferences)", IMarker.SEVERITY_ERROR);
 			return false;
 		}
-		IPath path = options.getOrDefault(preferences.executableLocation);
+		IPath path = executableLocation(options);
 
 		if (!path.toFile().isFile()) {
 			return false;
 		}
 
 		return true;
+	}
+
+	private IPath executableLocation(AldorProjectOptions options) {
+		return IPaths.executablePath(options.getOrDefault(preferences.executableLocation), System.getenv("PATH"));
 	}
 
 	public IMarker emitCannotBuildError() {
@@ -296,7 +294,7 @@ public class BuildCommands {
 	public IPath aldorExecutable() {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
-		return options.getOrDefault(preferences.executableLocation);
+		return executableLocation(options);
 	}
 
 
