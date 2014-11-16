@@ -310,7 +310,10 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 		for (IFile file : filesToUpdate) {
 			try {
 				ScanResult scan = scanner.scan(file);
-				if (!scan.skipBuild()) {
+				if (scan.skipBuild()) {
+					if (dependencyState.isKnownName(dependencyState.getName(file)))
+						dependencyState.doNotBuild(file);
+				} else {
 					Iterable<String> filtered = Iterables.filter(scan.dependencies(), new Predicate<String>() {
 
 						@Override

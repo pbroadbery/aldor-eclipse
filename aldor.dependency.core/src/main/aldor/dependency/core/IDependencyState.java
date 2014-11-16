@@ -29,4 +29,6 @@ public interface IDependencyState<FileObj> {
 
 	boolean needsBuild(String name);
 	void built(String name);
+
+	public abstract void doNotBuild(FileObj file);
 }

@@ -2,6 +2,7 @@ package aldor.dependency.core;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,11 +11,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 
 public class DependencyState<Named extends INamed> implements IDependencyState<Named> {
-	DependencyMap dependencyMap = new DependencyMap();
-	KnownFileState<Named> fileState = new KnownFileState<Named>();
-	Set<String> needsDependencyUpdate = new TreeSet<>();
-	Set<String> needsRebuild = new TreeSet<>();
-
+	private DependencyMap dependencyMap = new DependencyMap();
+	private KnownFileState<Named> fileState = new KnownFileState<Named>();
+	private Set<String> needsDependencyUpdate = new TreeSet<>();
+	private Set<String> needsRebuild = new TreeSet<>();
+	private Set<Named> doNotBuildSet = new HashSet<Named>();
 	/*
 	 * (non-Javadoc)
 	 *
@@ -32,8 +33,9 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 	@Override
 	public String toString() {
-		return "{DepState " + dependencyMap
-				+ " Files: " + fileState +" Rebuild: "+ needsRebuild + " depUpdate: " + needsDependencyUpdate + "}";
+		return "{DepState " + dependencyMap + " Files: " + fileState
+				+ " Do not build: " + doNotBuildSet
+				+ " Rebuild: "+ needsRebuild + " depUpdate: " + needsDependencyUpdate + "}";
 	}
 	/*
 	 * (non-Javadoc)
@@ -45,7 +47,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		assert fileState.validate();
 		boolean needsUpdate = fileState.add(file);
 		if (needsUpdate)
-			updateDependencies(file.getName());
+			clearBuildInformation(file.getName());
 		this.needsRebuild.add(file.getName());
 		assert fileState.validate();
 		assert !this.needsDependencyUpdate().isEmpty();
@@ -61,13 +63,23 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 		assert fileState.validate();
 		boolean needsUpdate = fileState.remove(file);
 		if (needsUpdate)
-			updateDependencies(file.getName());
+			clearBuildInformation(file.getName());
 		assert fileState.validate();
 	}
 
-	private void updateDependencies(String name) {
+	@Override
+	public void doNotBuild(Named file) {
+		this.doNotBuildSet.add(file);
+	}
+
+	private boolean isNotForBuild(Named file) {
+		return this.doNotBuildSet.contains(file);
+	}
+
+	private void clearBuildInformation(String name) {
 		dependencyMap.clearDependencies(name);
 		needsDependencyUpdate.add(name);
+		doNotBuildSet.remove(name);
 	}
 
 	/*
@@ -92,6 +104,7 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 
 			@Override
 			public Named apply(String arg0) {
+				assert fileState.isKnownName(arg0);
 				return fileState.fileForString(arg0);
 			}
 		});
@@ -202,6 +215,10 @@ public class DependencyState<Named extends INamed> implements IDependencyState<N
 	private Status visitInBuildOrderForBuild0(Function<Named, Boolean> function, String name, Map<String, Status> visited) {
 		if (visited.containsKey(name))
 			return visited.get(name);
+		if (this.isNotForBuild(fileState.fileForString(name))) {
+			visited.put(name, Status.UpToDate);
+			return Status.UpToDate;
+		}
 		visited.put(name, Status.Failed);
 
 		if (dependencyMap.inCycle(name)) {

@@ -38,12 +38,12 @@ public abstract class DelegatedDependencyState<T> implements
 		}
 	}
 
-	private DependencyState<DelegatedDependencyState<T>.Wrapper> delegate;
+	private IDependencyState<DelegatedDependencyState<T>.Wrapper> delegate;
 
 	public DelegatedDependencyState() {
 		this.delegate = new DependencyState<Wrapper>();
 	}
-	
+
 	@Override
 	public String toString() {
 		return delegate.toString();
@@ -83,14 +83,20 @@ public abstract class DelegatedDependencyState<T> implements
 				new Function<Wrapper, T>() {
 					@Override
 					public T apply(DelegatedDependencyState<T>.Wrapper arg0) {
+						assert arg0 != null;
 						return arg0.value();
 					}
 				});
 	}
 
 	@Override
-	public void updateDependencies(T file, Iterable<String> filtered) {
-		delegate.updateDependencies(new Wrapper(file), filtered);
+	public void updateDependencies(T file, Iterable<String> foundDependencies) {
+		delegate.updateDependencies(new Wrapper(file), foundDependencies);
+	}
+
+	@Override
+	public void doNotBuild(T file) {
+		delegate.doNotBuild(new Wrapper(file));
 	}
 
 	@Override
@@ -105,7 +111,7 @@ public abstract class DelegatedDependencyState<T> implements
 		});
 	}
 
-	
+
 	@Override
 	public void visitInBuildOrder(final Function<T, Boolean> function) {
 		delegate.visitInBuildOrder(new Function<Wrapper, Boolean>() {
@@ -141,5 +147,5 @@ public abstract class DelegatedDependencyState<T> implements
 		delegate.built(name);
 	}
 
-	
+
 }
