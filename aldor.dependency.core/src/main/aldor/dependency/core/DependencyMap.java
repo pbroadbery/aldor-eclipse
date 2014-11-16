@@ -23,6 +23,7 @@ public class DependencyMap {
 
 	boolean needsRebuild = true;
 
+	@Override
 	public String toString() {
 		return "{DepMap: " + dependencyMap +" files: " + knownFiles +" dependencies: " + dependencies + "clq: " + cliques + "rev: " + reverseMap + "}";
 	}

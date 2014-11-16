@@ -40,6 +40,7 @@ public class AldorPreferencePage
 	 * of preferences. Each field editor knows how to save and
 	 * restore itself.
 	 */
+	@Override
 	public void createFieldEditors() {
 		addField(
 			new StringFieldEditor(preferenceModel.executableLocation.name(), preferenceModel.executableLocation.name(), getFieldEditorParent()));
@@ -48,6 +49,7 @@ public class AldorPreferencePage
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
+	@Override
 	public void init(IWorkbench workbench) {
 	}
 	

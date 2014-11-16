@@ -40,7 +40,8 @@ public class AldorLabelProvider implements ILabelProvider {
 
 	}
 
-    public Image getImage(Object element) {
+    @Override
+	public Image getImage(Object element) {
         System.out.println("LabelProvider.getImage: " + element.getClass().getName());
         Image image = null;
  
