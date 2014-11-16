@@ -13,6 +13,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import aldor.core.commandline.AldorCommandLine;
@@ -70,7 +71,7 @@ public class BuildCommandsTest {
 		IProjectNature theAldorNature = new AldorNature();
 
 		Mockito.when(project.getName()).thenReturn("project");
-		Mockito.when(project.getNature(Mockito.eq(AldorNature.NATURE_ID))).thenReturn(theAldorNature);
+		Mockito.when(project.getNature(Matchers.eq(AldorNature.NATURE_ID))).thenReturn(theAldorNature);
 		Mockito.when(project.getLocation()).thenReturn(Path.fromPortableString("."));
 		theAldorNature.setProject(project);
 		return project;
