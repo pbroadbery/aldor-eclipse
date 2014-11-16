@@ -58,8 +58,8 @@ public class BuildCommandsTest {
 		AldorCommandLine cmd = buildCommands.prepareBuildIntermediateCommandLine(aFile);
 		System.out.println("" + cmd.toCommandString());
 		List<String> arguments = Arrays.asList(cmd.arguments());
-		Asserts.assertContains(arguments, "-Fao=aldor-generated/ao/foo.ao");
-		Asserts.assertContains(arguments, "-DBUILD_project");
+		Asserts.assertContains("-Fao=aldor-generated/ao/foo.ao", arguments);
+		Asserts.assertContains("-DBUILD_project", arguments);
 	}
 
 	private IProject createSimpleProject() throws CoreException {
