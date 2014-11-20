@@ -171,7 +171,11 @@ public class AldorProjectSupport {
 	}
 
 	public static AldorNature aldorNature(IProject project) throws CoreException {
-		return (AldorNature) project.getNature(AldorNature.NATURE_ID);
+		AldorNature nature = (AldorNature) project.getNature(AldorNature.NATURE_ID);
+		if (nature != null)
+			return nature;
+		else
+			throw new CoreException(null);
 	}
 
 	public static IPreferenceStore getPreferenceStore(IProject project) {
