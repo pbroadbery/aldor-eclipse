@@ -390,7 +390,7 @@ public class AldorBuilder extends IncrementalProjectBuilder {
 		for (IPath intermediatePath: intermediateFiles) {
 			IPath objectFile = buildCommands.objectFileForIntermediate(intermediatePath);
 			objectFiles.add(objectFile);
-			buildCommands.buildObjectFile(objectFile, monitor);
+			buildCommands.buildObjectFile(intermediatePath, monitor);
 		}
 
 		buildCommands.createObjectLibrary(monitor, buildCommands.objectLibraryName(), objectFiles);

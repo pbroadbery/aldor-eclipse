@@ -255,11 +255,11 @@ public class BuildCommands {
 	}
 
 
-	AldorCommandLine prepareCompileIntermediateToObjectCommandLine(IPath path, IPath objectPath) {
+	AldorCommandLine prepareCompileIntermediateToObjectCommandLine(IPath intermediatePath, IPath objectPath) {
 		AldorProjectOptions options = new AldorProjectOptions();
 		options.load(project);
 		AldorCommandLine commandLine = new AldorCommandLine(this.executableLocation(options));
-		commandLine.inputFilePath(path);
+		commandLine.inputFilePath(intermediatePath);
 		commandLine.addOutput(FileType.Object, objectPath);
 
 		return commandLine;
