@@ -1,8 +1,6 @@
 package aldor.util.sexpr;
 
 import java.io.Reader;
-import java.util.LinkedList;
-import java.util.List;
 
 import aldor.util.ReaderCharacterStream;
 import aldor.util.SExpression;
@@ -10,12 +8,15 @@ import aldor.util.Stream;
 import aldor.util.Strings;
 
 public class SExpressionReader {
-
 	ITokeniser tokeniser;
+
+	public SExpressionReader(Reader reader) {
+		tokeniser = new WhitespaceFilter(new Tokeniser(reader));
+	}
 
 	public SExpression read() {
 		Token tok = tokeniser.peek();
-
+		tokeniser.next();
 		switch (tok.type()) {
 		case CParen:
 			throw new RuntimeException("Parse error");
@@ -26,17 +27,55 @@ public class SExpressionReader {
 		case Symbol:
 			return SExpression.symbol(tok.text());
 		case OParen:
-
-			tokeniser.next();
-			List<SExpression> lst = new LinkedList<SExpression>();
-			while (tokeniser.peek().type() != TokenType.CParen) {
-				SExpression next = read();
-				lst.add(next);
-			}
-			tokeniser.next();
+			return readListOrNil();
+		case DOT:
+			throw new RuntimeException("Parse error: " + tok);
 		default:
 		}
-		return null;
+		throw new RuntimeException("Unexpected token: "+ tok);
+	}
+
+	private SExpression readListOrNil() {
+		Token next = tokeniser.peek();
+		if (next.type() == TokenType.CParen) {
+			tokeniser.next();
+			return SExpression.nil();
+		}
+		else {
+			return readList();
+		}
+	}
+
+	private SExpression readList() {
+		SExpression head = SExpression.cons(SExpression.nil(), SExpression.nil());
+		SExpression ptr = head;
+		boolean done = false;
+		while (!done) {
+			SExpression next = read();
+			ptr.setCar(next);
+			Token nextToken = tokeniser.peek();
+			if (nextToken.type() == TokenType.DOT) {
+				tokeniser.next();
+				SExpression endSx = read();
+				ptr.setCdr(endSx);
+				nextToken = tokeniser.peek();
+				if (nextToken.type() != TokenType.CParen) {
+					throw new RuntimeException("Parse error " + nextToken);
+				}
+				tokeniser.next();
+				done = true;
+			}
+			else if (nextToken.type() == TokenType.CParen) {
+				tokeniser.next();
+				done = true;
+			}
+			else {
+				SExpression newConsCell = SExpression.cons(head, SExpression.nil());
+				ptr.setCdr(newConsCell);
+				ptr = newConsCell;
+			}
+		}
+		return head;
 	}
 
 	public boolean hasNext() {
@@ -58,37 +97,59 @@ public class SExpressionReader {
 			if (token != null)
 				return token;
 
-			if (stream.hasNext()) {
-				return new Token(TokenType.EOF, "");
+			if (!stream.hasNext()) {
+				token = new Token(TokenType.EOF, "");
 			}
 			char c = stream.peek();
 			if (c == '(') {
-				return new Token(TokenType.OParen, "");
+				token = new Token(TokenType.OParen, "");
+				stream.next();
 			}
-			if (c == ')') {
-				return new Token(TokenType.CParen, "");
+			else if (c == ')') {
+				token = new Token(TokenType.CParen, "");
+				stream.next();
 			}
-			if (c == '"') {
+			else if (c == '"') {
 				String text = readString();
-				return new Token(TokenType.String, text);
+				token = new Token(TokenType.String, text);
 			}
-			if (Character.isDigit(c)) {
+			else if (c == '.') {
+				token = new Token(TokenType.DOT, ".");
+				stream.next();
+			}
+			else if (Character.isDigit(c)) {
 				String text = readInteger();
-				return new Token(TokenType.Integer, text);
+				token = new Token(TokenType.Integer, text);
 			}
-			if (Character.isAlphabetic(c)) {
+			else if (Character.isAlphabetic(c)) {
 				String text = readWord();
-				return new Token(TokenType.Symbol, text);
+				token = new Token(TokenType.Symbol, text);
+			}
+			else if (c == '|') {
+				String text = readEscapedWord();
+				token = new Token(TokenType.Symbol, text);
+			}
+			else if (Character.isWhitespace(c)) {
+				token = new Token(TokenType.WS, ""+c);
+				stream.next();
+			}
+			else {
+				throw new RuntimeException("Unknown character " + c);
 			}
 			return token;
 		}
 
 		private String readString() {
+			assert stream.peek() == '"';
 			StringBuilder sb = new StringBuilder();
+			sb.append(stream.peek());
+			stream.next();
 			while (!stringTerminal(stream.peek())) {
 				sb.append(stream.peek());
 				stream.next();
 			}
+			sb.append(stream.peek());
+			stream.next();
 			return sb.toString();
 		}
 
@@ -100,22 +161,47 @@ public class SExpressionReader {
 			}
 			return sb.toString();
 		}
-		
+
 		private String readWord() {
 			StringBuilder sb = new StringBuilder();
-			while (stream.peek() != null && Character.isWhitespace(stream.peek())) {
+			while (stream.hasNext()
+					&& isSymbolCharacter(stream.peek())) {
 				sb.append(stream.peek());
 				stream.next();
 			}
 			return sb.toString();
 		}
-	
+
+		private boolean isSymbolCharacter(char c) {
+			if (Character.isWhitespace(c))
+				return false;
+			if (Character.isDigit(c) || Character.isAlphabetic(c)) {
+				return true;
+			}
+			return false;
+		}
+
+
+		private String readEscapedWord() {
+			StringBuilder sb = new StringBuilder();
+			stream.next();
+			while (stream.hasNext()
+					&& stream.peek() != '|') {
+				sb.append(stream.peek());
+				stream.next();
+			}
+			if (stream.peek() == '|') {
+				stream.next();
+			}
+			return sb.toString();
+		}
+
 		private boolean stringTerminal(Character c) {
 			if (c == null || c == '"')
 				return true;
 			return false;
 		}
-		
+
 		@Override
 		public void next() {
 			peek();

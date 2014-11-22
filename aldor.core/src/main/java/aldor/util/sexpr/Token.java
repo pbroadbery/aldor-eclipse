@@ -1,20 +1,30 @@
 package aldor.util.sexpr;
 
 
-class Token {
+final class Token {
+	private final TokenType type;
+	private final String text;
+
 	public Token(TokenType type, String string) {
 		this.type = type;
 		this.text = string;
 	}
 
-	public String text() {
+	final public String text() {
 		return text;
 	}
 
-	public TokenType type() {
+	final public TokenType type() {
 		return type;
 	}
 
-	TokenType type;
-	String text;
+	@Override
+	final public String toString() {
+		return "{T:" + type +" " + text + "}";
+	}
+
+	public boolean isWhitespace() {
+		return type.isWhitespace();
+	}
+
 }

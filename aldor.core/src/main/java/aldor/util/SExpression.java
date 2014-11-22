@@ -1,13 +1,17 @@
 package aldor.util;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 
+import aldor.util.sexpr.SExpressionReader;
 import aldor.util.sexpr.SExpressionTypes;
 import aldor.util.sexpr.Type;
 
 abstract public class SExpression {
 	private Type type;
-	
+
 	public SExpression(Type type) {
 		this.type = type;
 	}
@@ -15,12 +19,45 @@ abstract public class SExpression {
 	Type type() {
 		return type;
 	}
-	
-	public List<SExpression> list() {
-		throw new RuntimeException();
+
+	public static SExpression read(Reader reader) {
+		SExpressionReader rdr = new SExpressionReader(reader);
+		return rdr.read();
 	}
 
-	protected Integer integer() {
+
+	@Override
+	public String toString() {
+		Writer sw = new StringWriter();
+		try {
+			write(sw);
+		} catch (IOException e) {
+			throw new RuntimeException();
+		}
+		return sw.toString();
+	}
+
+	@Override
+	public final boolean equals(Object otherObj) {
+		if (!(SExpression.class.isAssignableFrom(otherObj.getClass()))) {
+			return false;
+		}
+
+		SExpression other = (SExpression) otherObj;
+		if (this.type() != other.type()) {
+			return false;
+		}
+
+		return innerEqual(other);
+	}
+
+	abstract protected boolean innerEqual(SExpression other);
+
+	public static SExpression cons(SExpression car, SExpression cdr) {
+		return new SExpressionTypes.Cons(car, cdr);
+	}
+
+	public int integer() {
 		throw new RuntimeException();
 	}
 
@@ -28,7 +65,7 @@ abstract public class SExpression {
 		throw new RuntimeException();
 	}
 
-	protected String symbol() {
+	public String symbol() {
 		throw new RuntimeException();
 	}
 
@@ -44,4 +81,36 @@ abstract public class SExpression {
 		return new SExpressionTypes.SymbolAtom(text);
 	}
 
+	public SExpression car() {
+		throw new RuntimeException();
+	}
+
+	public SExpression cdr() {
+		throw new RuntimeException();
+	}
+
+	public static SExpression nil() {
+		return SExpressionTypes.nil();
+	}
+
+
+	public void setCar(SExpression car) {
+		throw new RuntimeException();
+	}
+
+	public void setCdr(SExpression cdr) {
+		throw new RuntimeException();
+	}
+
+	public void write(Writer w) throws IOException {
+		throw new RuntimeException();
+	}
+
+	public boolean isOfType(Type type) {
+		return this.type == type;
+	}
+
+	public boolean isNull() {
+		return isOfType(Type.Nil);
+	}
 }
