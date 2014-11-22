@@ -7,8 +7,10 @@ public class ReaderCharacterStream implements Stream<Character> {
 	Exception exception;
 	int c;
 	private Reader reader;
+
 	public ReaderCharacterStream(Reader stream) {
 		this.reader = stream;
+		c = -2;
 	}
 
 	@Override
@@ -31,16 +33,16 @@ public class ReaderCharacterStream implements Stream<Character> {
 	@Override
 	public boolean hasNext() {
 		peek();
-		return c != -2;
+		return c != -1;
 	}
 
 	public boolean isInError() {
 		peek();
 		return exception != null;
 	}
-	
+
 	public void throwError() {
 		throw new RuntimeException(exception);
 	}
-	
+
 }

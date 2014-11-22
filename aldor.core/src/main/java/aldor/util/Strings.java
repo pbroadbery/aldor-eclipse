@@ -42,6 +42,11 @@ public class Strings {
 			public IPath decode(String to) {
 				return Path.fromPortableString(to);
 			}});
+		stringCodecFor(Integer.class, new StringCodec<Integer>() {
+			@Override
+			public Integer decode(String to) {
+				return Integer.valueOf(to);
+			}});
 	}
 
 	@SuppressWarnings("unchecked")
