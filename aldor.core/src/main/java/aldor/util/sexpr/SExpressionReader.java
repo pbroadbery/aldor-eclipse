@@ -121,7 +121,7 @@ public class SExpressionReader {
 				String text = readInteger();
 				token = new Token(TokenType.Integer, text);
 			}
-			else if (Character.isAlphabetic(c)) {
+			else if (isSymbolStartCharacter(c)) {
 				String text = readWord();
 				token = new Token(TokenType.Symbol, text);
 			}
@@ -166,16 +166,42 @@ public class SExpressionReader {
 			StringBuilder sb = new StringBuilder();
 			while (stream.hasNext()
 					&& isSymbolCharacter(stream.peek())) {
-				sb.append(stream.peek());
+				Character thisChar = stream.peek();
+				if (thisChar == '\\') {
+					stream.next();
+					thisChar = stream.peek();
+				}
+				sb.append(thisChar);
 				stream.next();
 			}
 			return sb.toString();
 		}
 
+		private boolean isSymbolStartCharacter(char c) {
+			if (Character.isDigit(c))
+				return false;
+			if (isSymbolCharacter(c)) {
+				return true;
+			}
+			return false;
+		}
+
 		private boolean isSymbolCharacter(char c) {
 			if (Character.isWhitespace(c))
 				return false;
-			if (Character.isDigit(c) || Character.isAlphabetic(c)) {
+			if (Character.isDigit(c)
+					|| Character.isAlphabetic(c)
+					|| c == '\\'
+					|| c == '='
+					|| c == '<'
+					|| c == '>'
+					|| c == '-'
+					|| c == '+'
+					|| c == '*'
+					|| c == '/'
+					|| c == '^'
+					|| c == '%'
+					|| c == '~') {
 				return true;
 			}
 			return false;
