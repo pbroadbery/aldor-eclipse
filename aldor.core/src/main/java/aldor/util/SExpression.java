@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.AbstractSequentialList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import aldor.util.sexpr.SExpressionReader;
 import aldor.util.sexpr.SExpressionTypes;
-import aldor.util.sexpr.Type;
+import aldor.util.sexpr.SxType;
 
 abstract public class SExpression {
-	private Type type;
+	private SxType type;
 
-	public SExpression(Type type) {
+	public SExpression(SxType type) {
 		this.type = type;
 	}
 
-	Type type() {
+	public SxType type() {
 		return type;
 	}
 
@@ -61,12 +65,12 @@ abstract public class SExpression {
 		throw new RuntimeException();
 	}
 
-	protected String string() {
-		throw new RuntimeException();
+	public String string() {
+		throw new RuntimeException("string: " + this);
 	}
 
 	public String symbol() {
-		throw new RuntimeException();
+		throw new RuntimeException(""+ this);
 	}
 
 	public static SExpression integer(Integer value) {
@@ -82,7 +86,7 @@ abstract public class SExpression {
 	}
 
 	public SExpression car() {
-		throw new RuntimeException();
+		throw new RuntimeException("car: "+this);
 	}
 
 	public SExpression cdr() {
@@ -106,11 +110,13 @@ abstract public class SExpression {
 		throw new RuntimeException();
 	}
 
-	public boolean isOfType(Type type) {
+	public boolean isOfType(SxType type) {
 		return this.type == type;
 	}
 
 	public boolean isNull() {
-		return isOfType(Type.Nil);
+		return isOfType(SxType.Nil);
+	}
+
 	}
 }

@@ -11,7 +11,7 @@ public class SExpressionTypes {
 		SExpression cdr;
 
 		public Cons(SExpression car, SExpression cdr) {
-			super(Type.Cons);
+			super(SxType.Cons);
 			this.car = car;
 			this.cdr = cdr;
 		}
@@ -50,7 +50,7 @@ public class SExpressionTypes {
 			while (!done) {
 				current.car().write(w);
 
-				if (current.cdr().isOfType(Type.Cons)) {
+				if (current.cdr().isOfType(SxType.Cons)) {
 					w.write(" ");
 					current = current.cdr();
 				} else if (current.cdr().isNull()) {
@@ -69,7 +69,7 @@ public class SExpressionTypes {
 	public static class AbstractAtom<T> extends SExpression {
 		T value;
 
-		AbstractAtom(Type type, T value) {
+		AbstractAtom(SxType type, T value) {
 			super(type);
 			this.value = value;
 		}
@@ -89,7 +89,7 @@ public class SExpressionTypes {
 
 	public static class IntegerAtom extends AbstractAtom<Integer> {
 		public IntegerAtom(int n) {
-			super(Type.Integer, n);
+			super(SxType.Integer, n);
 		}
 
 		@Override
@@ -106,7 +106,7 @@ public class SExpressionTypes {
 
 	public static class StringAtom extends AbstractAtom<String> {
 		public StringAtom(String text) {
-			super(Type.String, text);
+			super(SxType.String, text);
 		}
 
 		@Override
@@ -124,7 +124,7 @@ public class SExpressionTypes {
 
 	public static class SymbolAtom extends AbstractAtom<String> {
 		public SymbolAtom(String text) {
-			super(Type.Symbol, text);
+			super(SxType.Symbol, text);
 		}
 
 		@Override
@@ -140,7 +140,7 @@ public class SExpressionTypes {
 
 	public static class Nil extends SExpression {
 		public Nil() {
-			super(Type.Nil);
+			super(SxType.Nil);
 		}
 
 		@Override

@@ -12,12 +12,13 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import aldor.util.SExpression;
-import aldor.util.sexpr.Type;
+import aldor.util.sexpr.SxType;
 
 public class SExpressionTest {
 
@@ -79,7 +80,7 @@ public class SExpressionTest {
 	@Test
 	public void testEscaped() {
 		SExpression sx = read(new StringReader("(|hello| 22)"));
-		assertTrue(sx.isOfType(Type.Cons));
+		assertTrue(sx.isOfType(SxType.Cons));
 
 		assertEquals("hello", sx.car().symbol());
 		assertEquals(22, sx.cdr().car().integer());

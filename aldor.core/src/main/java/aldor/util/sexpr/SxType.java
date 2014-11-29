@@ -1,5 +1,5 @@
 package aldor.util.sexpr;
 
-public enum Type {
+public enum SxType {
 	Cons, Integer, String, Symbol, Nil;
 }
