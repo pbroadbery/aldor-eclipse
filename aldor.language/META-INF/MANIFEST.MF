@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Language
+Bundle-SymbolicName: aldor.language
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: aldor.language.Activator
+Bundle-Vendor: PAB
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.junit;bundle-version="4.11.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: aldor.util,
+ aldor.util.sexpr,
+ com.google.common.base;version="15.0.0",
+ com.google.common.collect;version="15.0.0",
+ org.junit
