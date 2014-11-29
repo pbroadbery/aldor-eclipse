@@ -23,4 +23,15 @@ public class Lists2 {
 		return false;
 	}
 
+	public static String toString(String separator, List<?> lst) {
+		StringBuilder builder = new StringBuilder();
+		String sep = "";
+		for (Object o: lst) {
+			builder.append(sep);
+			builder.append(o);
+			sep = separator;
+		}
+		return builder.toString();
+	}
+
 }

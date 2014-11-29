@@ -107,4 +107,8 @@ public class Strings {
 		}
 	}
 
+	public static String toString(String separator, List<?> lst) {
+		return Lists2.toString(separator, lst);
+	}
+
 }
