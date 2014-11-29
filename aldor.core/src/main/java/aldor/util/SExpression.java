@@ -118,5 +118,70 @@ abstract public class SExpression {
 		return isOfType(SxType.Nil);
 	}
 
+	public List<SExpression> asList() {
+		return new SExpressionList(this);
 	}
+
+	/**
+	 * Just enough to turn SExpression into a list.
+	 * Don't expect it to be efficient, especially with random access queries.
+	 * @author pab
+	 *
+	 */
+	private final class SExpressionList extends AbstractSequentialList<SExpression> {
+		int size = -1;
+		SExpression sx;
+
+		SExpressionList(SExpression sx) {
+			this.sx = sx;
+		}
+
+		@Override
+		public ListIterator<SExpression> listIterator(int index) {
+			SExpression startSx = sx;
+			for (int i=0; i<index; i++) {
+				startSx = startSx.cdr();
+			}
+			return Iterators.listIterator(new SExpressionIterator(startSx));
+		}
+
+		@Override
+		public int size() {
+			if (size == -1) {
+				int count = 0;
+				for (@SuppressWarnings("unused") SExpression elt: this) {
+					count++;
+				}
+				size = count;
+			}
+			return size;
+		}
+	}
+
+	private final class SExpressionIterator implements Iterator<SExpression> {
+		private SExpression sx;
+
+		SExpressionIterator(SExpression sx) {
+			this.sx = sx;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !sx.isNull();
+		}
+
+		@Override
+		public SExpression next() {
+			SExpression item = sx.car();
+			sx = sx.cdr();
+			return item;
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
 }

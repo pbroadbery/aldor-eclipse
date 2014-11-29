@@ -96,4 +96,15 @@ public class SExpressionTest {
 
 		}
 	}
+
+	public void testIterator() {
+		SExpression sx = read(new StringReader("(a b c)"));
+		List<SExpression> lst = sx.asList();
+		assertEquals(3, lst.size());
+		assertEquals(2, lst.subList(1, lst.size()));
+		for (SExpression subsx: lst) {
+			assertTrue(subsx.isOfType(SxType.Symbol));
+		}
+	}
+
 }
