@@ -5,7 +5,6 @@ import org.junit.Test;
 import aldor.language.type.AbstractSyntax.AbId;
 import aldor.language.type.TypeSystem.Scope;
 import aldor.language.type.TypeSystem.ScopeType;
-import aldor.language.type.TypeSystem.SymbolMeaning;
 import aldor.language.type.Types.TypeKind;
 import aldor.language.type.Types.With;
 

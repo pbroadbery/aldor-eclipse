@@ -7,29 +7,12 @@ import java.util.List;
 import aldor.language.type.AbstractSyntax.AbSyn;
 import aldor.language.type.TypeSystem.Scope;
 import aldor.language.type.TypeSystem.ScopeType;
-import aldor.language.type.TypeSystem.SymbolMeaning;
-import aldor.language.type.TypeSystem.SymeList;
 
 import com.google.common.collect.Lists;
 
 public class Types {
 
-	public static class Third extends ConcreteType<Third> {
-
-		private Type inner;
-
-		Third(Scope parentScope, Type inner, AbSyn whole) {
-			super(TypeKind.third, parentScope, whole);
-			this.inner = inner;
-		}
-
-		public Type inner() {
-			return inner;
-		}
-
-	}
-
-	static class TypeKind<T> {
+	static class TypeKind<T extends ConcreteType<T>> {
 		static final TypeKind<Define> define = new TypeKind<Define>(Define.class, "Define", false);
 		static final TypeKind<Declare> declare = new TypeKind<Declare>(Declare.class, "Declare", false);
 		static final TypeKind<Map> map = new TypeKind<Map>(Map.class, "Map");
@@ -38,7 +21,7 @@ public class Types {
 		static final TypeKind<With> with = new TypeKind<With>(With.class, "With");
 		static final TypeKind<Error> error = new TypeKind<Error>(Error.class, "Error");
 		static final TypeKind<Third> third = new TypeKind<Third>(Third.class, "Third");
-		public static TypeKind<Exports> exports = new TypeKind<Exports>(Exports.class, "Exports");
+		static final TypeKind<Exports> exports = new TypeKind<Exports>(Exports.class, "Exports");
 
 		private final Class<T> clss;
 		private final String name;
@@ -86,12 +69,12 @@ public class Types {
 		}
 
 		@Override
-		public boolean isOfKind(TypeKind<?> kind) {
+		public <X extends ConcreteType<X>> boolean isOfKind(TypeKind<X> kind) {
 			return kind == this.kind;
 		}
 
 		@Override
-		public <X> X asKind(TypeKind<X> kind) {
+		public <X extends ConcreteType<X>> X asKind(TypeKind<X> kind) {
 			if (isOfKind(kind)) {
 				return kind.clss().cast(this);
 			}
@@ -105,7 +88,7 @@ public class Types {
 
 		@Override
 		public List<SymbolMeaning> exports(ExportKind kind) {
-			throw new RuntimeException("" + this.kind + " has no " + kind + " exports");
+			throw new RuntimeException("" + this.kind + " has no " + kind + " exports " + this.toAbSyn());
 		}
 
 		@Override
@@ -116,6 +99,26 @@ public class Types {
 		@Override
 		public final AbSyn toAbSyn() {
 			return absyn;
+		}
+
+		abstract boolean isTypeEqualModPercent(Scope scope, T other);
+	}
+
+	public static class Third extends ConcreteType<Third> {
+
+		private Type inner;
+
+		Third(Scope parentScope, Type inner, AbSyn whole) {
+			super(TypeKind.third, parentScope, whole);
+			this.inner = inner;
+		}
+
+		public Type inner() {
+			return inner;
+		}
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Third type) {
+			throw new RuntimeException("Not implemented");
 		}
 	}
 
@@ -137,6 +140,10 @@ public class Types {
 			return type;
 		}
 
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Define type) {
+			throw new RuntimeException("Not implemented");
+		}
 	}
 
 	public static class Declare extends ConcreteType<Declare> {
@@ -156,6 +163,12 @@ public class Types {
 		public SymbolMeaning declaredSymbol() {
 			return syme;
 		}
+
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Declare type) {
+			throw new RuntimeException("Not implemented");
+		}
+
 	}
 
 	public static class Map extends ConcreteType<Map> {
@@ -193,7 +206,11 @@ public class Types {
 		public int retCount() {
 			return retList().size();
 		}
-
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Map type) {
+			return scope.typeSystem().isTypeEqualModPercent(scope, this.rets(), type.rets())
+					&& scope.typeSystem().isTypeEqualModPercent(scope, this.params(), type.params());
+		}
 	}
 
 	public static class Cross extends ConcreteType<Cross> {
@@ -204,9 +221,36 @@ public class Types {
 			types = Lists.newArrayList(type1, type2);
 		}
 
+		public Cross(Scope scope, AbSyn absyn, List<Type> children) {
+			super(TypeKind.cross, scope, absyn);
+			types = Lists.newArrayList(children);
+		}
+
 		public List<Type> asList() {
 			return types;
 		}
+
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Cross type) {
+			if (this.length() != type.length()) {
+				return false;
+			}
+			for (int i=0; i<length(); i++) {
+				if (!scope.typeSystem().isTypeEqualModPercent(scope, component(i), type.component(i))) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private Type component(int i) {
+			return types.get(i);
+		}
+
+		private int length() {
+			return types.size();
+		}
+
 	}
 
 	static class General extends ConcreteType<General> {
@@ -216,6 +260,12 @@ public class Types {
 			super(TypeKind.general, parentScope, absyn);
 			this.syntax = absyn;
 		}
+
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, General type) {
+			return scope.typeSystem().isAbSynEqualModPercent(scope, this.absyn, type.absyn);
+		}
+
 	}
 
 	public static class With extends ConcreteType<With> {
@@ -242,6 +292,10 @@ public class Types {
 			return bindingScope;
 		}
 
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, With type) {
+			throw new RuntimeException("Not implemented");
+		}
 	}
 
 	static class LazyType extends ForwardingType {
@@ -277,19 +331,18 @@ public class Types {
 		AbSyn absyn() {
 			return absyn;
 		}
-
 	}
 
 	abstract static class ForwardingType implements Forward<Type>, Type {
 		Type value;
 
 		@Override
-		public boolean isOfKind(TypeKind<?> kind) {
+		public <X extends ConcreteType<X>> boolean isOfKind(TypeKind<X> kind) {
 			return follow().isOfKind(kind);
 		}
 
 		@Override
-		public <T> T asKind(TypeKind<T> kind) {
+		public <T extends ConcreteType<T>> T asKind(TypeKind<T> kind) {
 			return follow().asKind(kind);
 		}
 
@@ -320,6 +373,7 @@ public class Types {
 		public AbSyn toAbSyn() {
 			return follow().toAbSyn();
 		}
+
 	}
 
 	public static class Error extends ConcreteType<Error> {
@@ -328,6 +382,10 @@ public class Types {
 			super(TypeKind.error, scope, null);
 		}
 
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Error type) {
+			throw new RuntimeException("Not implemented");
+		}
 	}
 
 	public static class Exports extends ConcreteType<Exports> {
@@ -355,6 +413,15 @@ public class Types {
 			if (kind == ExportKind.CAT)
 				return catExports.asList();
 			throw new RuntimeException();
+		}
+
+		@Override
+		public boolean isTypeEqualModPercent(Scope scope, Exports type) {
+			throw new RuntimeException("Not implemented");
+		}
+
+		public Scope scope() {
+			return bindingScope;
 		}
 	}
 

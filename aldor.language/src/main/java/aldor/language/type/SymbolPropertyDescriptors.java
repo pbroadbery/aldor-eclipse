@@ -37,6 +37,7 @@ class SymbolPropertyDescriptors {
 	SymbolPropertyDescriptor<SExpression> domExports = new SymbolPropertyDescriptor<>(this, sx, "domExports", SExpression.nil());
 	SymbolPropertyDescriptor<SExpression> catExports = new SymbolPropertyDescriptor<>(this, sx, "catExports", SExpression.nil());
 	SymbolPropertyDescriptor<SExpression> condition = new SymbolPropertyDescriptor<>(this, sx, "condition", SExpression.nil());
+	SymbolPropertyDescriptor<Integer> srcpos = new SymbolPropertyDescriptor<>(this, integer, "srcpos", -1);
 
 
 	public final static SymbolPropertyDescriptors instance() {

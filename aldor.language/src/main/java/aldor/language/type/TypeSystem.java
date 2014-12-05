@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import aldor.language.type.AbstractSyntax.AbDeclare;
-import aldor.language.type.AbstractSyntax.AbId;
+import aldor.language.type.AbstractSyntax.AbKind;
 import aldor.language.type.AbstractSyntax.AbSyn;
+import aldor.language.type.AbstractSyntax.ConcreteAbSyn;
 import aldor.language.type.Type.ExportKind;
+import aldor.language.type.Types.ConcreteType;
 import aldor.language.type.Types.Exports;
 import aldor.language.type.Types.LazySyntaxType;
 import aldor.language.type.Types.LazyType;
@@ -105,112 +107,6 @@ public class TypeSystem {
 
 	}
 
-	static class SymeList {
-		final private List<SymbolMeaning> symes;
-
-		SymeList() {
-			this.symes = new ArrayList<>();
-		}
-
-		public void add(SymbolMeaning syme) {
-			symes.add(syme);
-		}
-
-		public List<SymbolMeaning> asList() {
-			return symes;
-		}
-	}
-
-	static class SymbolMeaning {
-		enum ConstructorType {
-			TypeSelfReference, Std
-		}
-
-		private final String name;
-		private final Type type;
-		private final Scope scope;
-		private Type effectiveValue;
-		private int typeHashCode;
-		private String documentation;
-		private boolean isDefault;
-
-		public SymbolMeaning(ConstructorType consType, Scope scope, String id, Type type, AbSyn value) {
-			this.name = id;
-			this.scope = scope;
-			this.type = typeForConstructor(consType, id, type, value);
-
-			assert this.scope != null;
-			assert this.name != null;
-			assert this.type != null;
-		}
-
-		public void effectiveValue(Type type) {
-			this.effectiveValue = type;
-		}
-
-		public Type effectiveValue() {
-			return this.effectiveValue;
-		}
-
-		public SymbolMeaning(Scope scope, String string, Type type) {
-			this(scope, string, type, null);
-		}
-
-		public SymbolMeaning(Scope scope, String string, Type type, AbSyn value) {
-			this(ConstructorType.Std, scope, string, type, value);
-		}
-
-		private Type typeForConstructor(ConstructorType consType, String name, Type type, AbSyn value) {
-			if (consType == ConstructorType.TypeSelfReference) {
-				assert type == null;
-				return new Types.General(scope, new AbId(name));
-			}
-			if (value == null) {
-				assert type != null;
-				return type;
-			}
-			TypeSystem sys = scope.typeSystem();
-			return sys.tfDefine(scope, null, sys.tfDeclare(scope, null, this, type), value);
-		}
-
-		public void isDefault(boolean flg) {
-			this.isDefault = flg;
-		}
-
-		public void typeCode(Integer integer) {
-			this.typeHashCode = integer;
-		}
-
-		public void documentation(String documentation) {
-			this.documentation = documentation;
-		}
-
-		@Override
-		public String toString() {
-			return "{S:" + scope + "> " + name + "}";
-		}
-
-		public AbSyn value() {
-			Types.Define define = this.type.asKind(TypeKind.define);
-			if (define == null)
-				return null;
-			return define.value();
-		}
-
-		public Type type() {
-			return type;
-		}
-
-		public String name() {
-			return name;
-		}
-
-		public void setEffectiveValue(Type type) {
-			this.effectiveValue = type;
-		}
-
-	}
-
 	public Type tfLazy(Scope scope, String name) {
 		return new Types.LazyType(scope, name);
 	}
@@ -252,6 +148,7 @@ public class TypeSystem {
 		theSymbol.isDefault(symbolProperties.get(symbolPropertyDescriptors._default));
 		theSymbol.typeCode(symbolProperties.get(symbolPropertyDescriptors.symeTypeCode));
 		theSymbol.documentation(symbolProperties.get(symbolPropertyDescriptors.documentation));
+		theSymbol.srcpos(symbolProperties.get(symbolPropertyDescriptors.srcpos));
 		final List<SExpression> domExports = symbolProperties.get(symbolPropertyDescriptors.domExports).asList();
 
 		final List<SExpression> catExports = symbolProperties.get(symbolPropertyDescriptors.catExports).asList();
@@ -295,9 +192,48 @@ public class TypeSystem {
 	}
 
 	public AbSyn abWithExpression() {
-		return new AbstractSyntax.AbGeneric(instance.with, Collections.<AbSyn>emptyList());
+		return new AbstractSyntax.AbBoundGeneric(instance.with, Collections.<AbSyn>emptyList());
 	}
 
+	public boolean isTypeEqualModPercent(Scope scope, Type type1, Type type2) {
+		if (type1.isOfKind(TypeKind.declare))
+			type1 = type1.asKind(TypeKind.declare).type();
+		if (type2.isOfKind(TypeKind.declare))
+			type2 = type2.asKind(TypeKind.declare).type();
+		boolean flg = _isTypeEqualModPercent(scope, type1.kind(), type1, type2);
+		System.out.println("Eq: " + type1.toAbSyn() + " " + type2.toAbSyn() + " --> " + flg);
+		return flg;
+	}
+
+	// Only needed to get generics right without casting.
+	private <T extends ConcreteType<T>> boolean _isTypeEqualModPercent(Scope scope, TypeKind<T> kind, Type type1, Type type2) {
+		if (kind != type2.kind()) {
+			return false;
+		}
+
+		T _type1 = type1.asKind(kind);
+		T _type2 = type2.asKind(kind);
+
+		return _type1.isTypeEqualModPercent(scope, _type2);
+	}
+
+	public boolean isAbSynEqualModPercent(Scope scope, AbSyn absyn1, AbSyn absyn2) {
+		boolean flg = _isAbSynEqualModPercent(scope, absyn1.kind(), absyn1, absyn2);
+		System.out.println("AbEq: " + absyn1 + " " + absyn2 + " --> " + flg);
+		return flg;
+	}
+
+	public <T extends ConcreteAbSyn<T>> boolean _isAbSynEqualModPercent(Scope scope, AbKind<T> kind, AbSyn absyn1, AbSyn absyn2) {
+		if (!absyn1.kind().equals(absyn2.kind())) {
+			return false;
+		}
+
+		T _absyn1 = absyn1.asKind(kind);
+		T _absyn2 = absyn2.asKind(kind);
+
+		return _absyn1.isAbSynEqualModPercent(scope, _absyn2);
+
+	}
 }
 /*
 	static interface SxConverter {

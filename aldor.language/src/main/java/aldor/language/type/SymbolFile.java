@@ -10,8 +10,6 @@ import aldor.language.type.AbstractSyntax.AbDeclare;
 import aldor.language.type.AbstractSyntax.AbSyn;
 import aldor.language.type.TypeSystem.Scope;
 import aldor.language.type.TypeSystem.ScopeType;
-import aldor.language.type.TypeSystem.SymbolMeaning;
-import aldor.language.type.TypeSystem.SymeList;
 import aldor.util.SExpression;
 
 public class SymbolFile {
@@ -43,8 +41,8 @@ public class SymbolFile {
 
 	private void read() throws FileNotFoundException {
 		BufferedReader reader = new BufferedReader(new FileReader(pathToFile));
-		SExpression sx = SExpression.read(reader);
-
+		SExpression sx = SExpression.read(reader, true);
+System.out.println("" + sx);
 		Scope scope = new Scope(this.globalScope, ScopeType.FILE);
 		bindSymbolsToScope(scope, sx);
 		this.boundSymbols = scope.boundSymbols();
@@ -55,6 +53,7 @@ public class SymbolFile {
 			if (decl.car().symbol().equals("Declare"))
 				bindDeclaration(scope, decl);
 			else {
+				// TODO: Do something a little more useful than this:
 				System.out.println("Skipping " + decl);
 			}
 		}

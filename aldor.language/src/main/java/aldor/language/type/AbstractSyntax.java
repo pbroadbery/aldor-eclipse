@@ -1,5 +1,6 @@
 package aldor.language.type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import aldor.language.type.AbTypes.AbSynToTypeConverter;
@@ -99,6 +100,8 @@ public class AbstractSyntax {
 			super(type);
 		}
 
+		public abstract boolean isAbSynEqualModPercent(Scope scope, T ab2);
+
 	}
 
 	static abstract class AbType1Generic<T extends ConcreteAbSyn<T>> extends AbKind<T> {
@@ -116,12 +119,14 @@ public class AbstractSyntax {
 				}
 			});
 
-			AbSyn absyn = this.newInstance(children);
-
+			AbSyn absyn = this.newInstance(new ArrayList<>(children));
+			System.out.println("Parsed: " + sx + " --> " + absyn);
 			return absyn;
 		}
 
 		protected abstract T newInstance(List<AbSyn> children);
+
+
 	}
 
 	static class AbTypeGeneric extends AbType1Generic<AbBoundGeneric> {
@@ -168,9 +173,15 @@ public class AbstractSyntax {
 			return id;
 		}
 
+		@Override
+		public boolean isAbSynEqualModPercent(Scope scope, AbId ab2) {
+			return this.id().equals(ab2.id());
+		}
+
+
 	}
 
-	static class AbGeneric<T extends ConcreteAbSyn<T>> extends ConcreteAbSyn<T> {
+	static class AbGeneric<T extends AbGeneric<T>> extends ConcreteAbSyn<T> {
 		private final List<AbSyn> children;
 
 		public AbGeneric(AbKind<T> type, List<AbSyn> children) {
@@ -186,6 +197,24 @@ public class AbstractSyntax {
 		public List<AbSyn> children() {
 			return children;
 		}
+
+
+		public AbSyn child(int i) {
+			return children.get(i);
+		}
+
+		@Override
+		public boolean isAbSynEqualModPercent(Scope scope, T ab2) {
+			if (children.size() != ab2.children().size())
+				return false;
+			for (int i=0; i<children.size(); i++) {
+				if (scope.typeSystem().isAbSynEqualModPercent(scope, child(i), ab2.child(i))) {
+					return false;
+				}
+			}
+			return true;
+		}
+
 	}
 
 	static class AbBoundGeneric extends AbGeneric<AbBoundGeneric> {
@@ -193,7 +222,6 @@ public class AbstractSyntax {
 		public AbBoundGeneric(AbKind<AbBoundGeneric> type, List<AbSyn> children) {
 			super(type, children);
 		}
-
 	}
 
 	static class AbApply extends AbGeneric<AbApply> {
@@ -233,15 +261,20 @@ public class AbstractSyntax {
 			this.type = type;
 			this.properties = properties;
 		}
-
+	@Override
+	public boolean isAbSynEqualModPercent(Scope scope, AbDeclare ab2) {
+		throw new RuntimeException();
+	}
 		public static AbSyn parse(SExpression sx) {
+			System.out.println("ParseDeclare: " + sx);
 			SExpression declareArgs = sx.cdr();
-			SExpression sym = declareArgs.car();
+			SExpression name = declareArgs.car();
 			SExpression type = declareArgs.cdr().car();
 			SExpression sxproperties = declareArgs.cdr().cdr().isNull() ? SExpression.nil() : declareArgs.cdr().cdr().car();
 			SymbolProperties properties = new SymbolProperties(sxproperties);
-			String name = sym.isNull() ? "_" : sym.symbol();
-			return new AbDeclare(name, AbstractSyntax.parse(type), properties);
+			SExpression sym = name.isOfType(SxType.Symbol) ? name : SExpression.nil();
+			String id = sym.isNull() ? "_" : sym.symbol();
+			return new AbDeclare(id, AbstractSyntax.parse(type), properties);
 		}
 
 		@Override
