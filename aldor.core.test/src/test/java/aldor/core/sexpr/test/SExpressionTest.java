@@ -87,6 +87,14 @@ public class SExpressionTest {
 		assertTrue(sx.cdr().cdr().isNull());
 	}
 
+	@Test
+	public void testEscaped2() {
+		SExpression sx = read(new StringReader("(|Add| () (FooBarBaz))"));
+		assertTrue(sx.isOfType(SxType.Cons));
+
+		System.out.println("" + sx);
+	}
+
 	public void testEmptyFile() {
 		try {
 			SExpression.read(new StringReader(""));

@@ -10,8 +10,12 @@ import aldor.util.Strings;
 public class SExpressionReader {
 	ITokeniser tokeniser;
 
+	public SExpressionReader(Reader reader, boolean allCapsSymbols) {
+		tokeniser = new WhitespaceFilter(new Tokeniser(reader, allCapsSymbols));
+	}
+
 	public SExpressionReader(Reader reader) {
-		tokeniser = new WhitespaceFilter(new Tokeniser(reader));
+		this(reader, false);
 	}
 
 	public SExpression read() {
@@ -83,12 +87,14 @@ public class SExpressionReader {
 	}
 
 	class Tokeniser implements ITokeniser {
-		private Stream<Character> stream;
+		private final Stream<Character> stream;
 		private Token token;
+		private final boolean allCapsSymbols;
 
-		Tokeniser(Reader stream) {
+		Tokeniser(Reader stream, boolean allCapsSymbols) {
 			this.stream = new ReaderCharacterStream(stream);
 			this.token = null;
+			this.allCapsSymbols = allCapsSymbols;
 		}
 
 		@Override
@@ -174,7 +180,10 @@ public class SExpressionReader {
 				sb.append(thisChar);
 				stream.next();
 			}
-			return sb.toString();
+			if (allCapsSymbols)
+				return sb.toString().toUpperCase();
+			else
+				return sb.toString();
 		}
 
 		private boolean isSymbolStartCharacter(char c) {

@@ -24,10 +24,20 @@ abstract public class SExpression {
 		return type;
 	}
 
-	public static SExpression read(Reader reader) {
-		SExpressionReader rdr = new SExpressionReader(reader);
+	public static SExpression read(Reader reader, boolean allCapsSymbols) {
+		SExpressionReader rdr = new SExpressionReader(reader, allCapsSymbols);
 		return rdr.read();
 	}
+
+	public static SExpression read(Reader reader) {
+		return read(reader, false);
+	}
+
+
+	public <T extends SExpression> T asType(SxType<T> type) {
+		return type.cast(this);
+	}
+
 
 
 	@Override
